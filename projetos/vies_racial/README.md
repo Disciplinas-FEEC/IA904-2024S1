@@ -20,6 +20,10 @@ O projeto visa compreender o viés racial em modelos amplamente reconhecidos na 
 
 Para alcançar este objetivo de detecção de viés iremos primeiramente analisar os embeddings das imagens utilizando ferramentas de redução de dimensionalidade como t-SNE (*t-distributed Stochastic Neighbor Embedding*) ou UMAP (*Uniform Manifold Approximation and Projection*) e, neste espaço reduzido, verificar como a rede separa diversas etnias. 
 
+Realizamos, também, uma análise na literatura de métricas de viés, como paridade demográfica, igualdade de oportunidades,etc... Estas métricas são essenciais para compreender melhor como o desempenho dos modelos varia entre diferentes grupos raciais e para identificar potenciais áreas de discriminação.
+
+Para a análise dessas métricas, selecionamos alguns modelos populares de detecção facial (MTNCC, Blaze Face e Retina Face), utilizando o dataset mencionado na seção de dataset. O MTNCC (Multi-Task Cascaded Convolutional Networks) é conhecido por sua eficácia em detecção facial multitarefa. Blaze Face é um modelo leve e rápido, frequentemente usado em aplicações móveis, enquanto Retina Face é aclamado por sua precisão em reconhecimento facial robusto. Esses modelos serão avaliados para identificar disparidades de desempenho entre diferentes grupos étnicos, proporcionando uma visão abrangente das limitações e potencialidades dos modelos em termos de equidade racial.
+
 ## Metodologia
 Nesta seção, será delineada a metodologia adotada para investigar o viés na distribuição dos embeddings das redes de imagens em relação à raça, utilizando técnicas de redução de dimensionalidade como t-Distributed Stochastic Neighbor Embedding (t-SNE) ou Uniform Manifold Approximation and Projection (UMAP). 
 
