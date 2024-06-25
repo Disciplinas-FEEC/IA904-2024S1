@@ -38,7 +38,7 @@ As métricas utilizadas serão:
 - Paridade Preditiva
 - Igualdade de Tratamento 
 
-## Bases de Dados e Evolução
+## Bases de Dados
 A base de dados que será utilizada será a [FairFace](https://github.com/joojs/fairface). Um conjunto de dados de atributos faciais para raças, gêneros e idades equilibrados. Durante este projeto, só serão utilizados os rótulos de raça. [1] Serão apresentados três exemplos de imagens presentes entre os dados e os respectivos rótulos:
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -78,7 +78,7 @@ Base de Dados | Endereço na Web | Resumo descritivo
 ----- | ----- | -----
 FairFace | https://github.com/dchen236/FairFace | Um conjunto de dados de atributos faciais para raças, gêneros e idades equilibrados. [1]
 
-## Ferramentas
+## Ambiente Computacional
 
 Serão apresentadas a seguir as ferramentas e bibliotecas a serem utilizadas durante o projeto.
 
