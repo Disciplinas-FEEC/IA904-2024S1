@@ -73,7 +73,19 @@ Conjunto de treino | Conjuntos do dataset pertencentes
 2 | Scenario0, Scenario1, Scenario2
 
 ## Ambiente Computacional
-> Descrever o ambiente/plataforma, bibliotecas e recursos computacionais utilizados, apresentando discussões, dicas e informações úteis para que outros possam utilizá-los.
+
+O ambiente computacional utilizado foi:
+
+- Hardware
+  - RTX 2060 6 GB
+  - 20 GB RAM
+- Software
+  - Pytorch 2.2.1
+  - MMPose 1.3.1
+  - Windows 10
+  - Python 3.8
+
+Devido ao custo de memória para carregar os dados durante o treino, a GPU não é totalmente utilizada, sendo provavelmente possível treinar os modelos criados com uma GPU menos rápida sem grandes perdas de performance.
 
 ## Workflow
 
