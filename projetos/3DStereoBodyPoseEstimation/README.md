@@ -64,6 +64,7 @@ Uma descrição mais detalhada do protocolo de geração pode ser obtido em [OAK
 > Descrever o ambiente/plataforma, bibliotecas e recursos computacionais utilizados, apresentando discussões, dicas e informações úteis para que outros possam utilizá-los.
 
 ## Workflow
+
 - Geração de dados sintéticos
 ![Workflow de geração de dados](assets/Pipeline-Geração.svg)
 - Treino do modelo
@@ -85,6 +86,17 @@ Uma descrição mais detalhada do protocolo de geração pode ser obtido em [OAK
 > Mais informações podem ser encontradas nos materiais de apoio no Classroom (Métricas para validação de análise de imagens).
 
 ## Experimentos e Resultados
+
+Inicialmente, realizamos uma análise do dataset para avaliar possíveis vieses. Para isso, plotamos histogramas relevantes, que podem ser visualizados a seguir.
+
+|  |  |
+|----------|----------|
+| ![Histograma de Altura](assets/dataset/histogram_height.png) | ![Histograma de Peso](assets/dataset/histogram_weight.png) |
+| ![Histograma de Etnia](assets/dataset/histogram_ethnicity.png) | ![Histograma De Sexo](assets/dataset/histogram_sex.png) |
+![Histograma de Idade](assets/dataset/histogram_age.png)
+
+Observamos que o dataset apresenta um bom balanceamento em relação a características como altura, peso, etnia e sexo. Possuindo distribuições uniformes e abrangendo diferentes faixas de valores. No entanto, identificamos um desequilíbrio na distribuição por idade. A maioria dos dados está concentrada em faixas etárias adultas, o que pode afetar a generalização do modelo para outras faixas etárias.
+
 > Descrição dos experimentos e resultados mais importantes.
 > Apresente os resultados da forma mais rica possível, com gráficos e tabelas. Mesmo que o seu código rode online em um notebook, apresente o link para execução online, mas copie para esta parte a figura estática.
 
@@ -101,6 +113,7 @@ O maior problema a ser enfrentado será a transferência do modelo do domínio s
 
 ## Trabalhos Futuros
 Para futuras pesquisas e desenvolvimentos, há algumas áreas que podem ser exploradas. Primeiramente, a etapa de refinamento da pose estimada pode ser aprimorada. Isso envolve ajustar os keypoints estimados para melhor se alinharem com a anatomia real do corpo humano. Além disso, a triangularização não linear, que foi planejada mas não foi realizada devido ao prazo, pode ser implementada para melhorar a precisão da estimativa 3D.
+Além das sugestões mencionadas anteriormente, existem outros pontos que podem ser explorados para aprimorar o estudo realizado. Primeiramente, testar diferentes arquiteturas de redes neurais pode ser interessante, visto que os resultados obtidos com a arquitetura utilizada não estão conforme o esperado. Além disso, considerar a coleta de dados além dos heatmaps, como informações de profundidade, pode enriquecer a estimativa 3D. Por fim, a realização da normalização dos dados, o que pode garantir uma maior consistência e precisão nas estimativas.
 
 ## Referências
 [1] Zheng, Ce, et al. "Deep learning-based human pose estimation: A survey." ACM Computing Surveys 56.1 (2023): 1-37.
