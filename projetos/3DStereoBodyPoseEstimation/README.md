@@ -78,6 +78,7 @@ O ambiente computacional utilizado foi:
 
 - Hardware
   - RTX 2060 6 GB
+  - AMD Ryzen 5 3600
   - 20 GB RAM
 - Software
   - Pytorch 2.2.1
