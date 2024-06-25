@@ -32,21 +32,23 @@ Arquitetura proposta:
 
 Base de Dados | Endereço na Web | Resumo descritivo
 -|-|-
-OAK-D Synthetic Pose|[Zenodo OAK-D Synthetic Pose](https://zenodo.org/uploads/12212762?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjA1NDI1YjdkLTllNmUtNDFlMy04NWVmLTljMGE2ZDdmOGI0NyIsImRhdGEiOnt9LCJyYW5kb20iOiJiZTk1MWI5NTk4NTIzYjVkZDYwZGU3NGM5YTg0YTI5NiJ9.VhPRO2qFmZyNMXF9lh5pxEmGCO7KZzUy9x-5JwKdU2eN9skNTl3VM7C9eVNhimMWotTRtbYScAqRLdx4sgUwug)|Dataset de imagens sintéticas com avatares realizando diferentes poses. Sintetizado para simular a captura com uma OAK-D. Contém anotação de keypoints 2D e 3D.
+OAK-D Synthetic Pose|[OAK-D Synthethic Pose Dataset ![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12212762.svg)](https://doi.org/10.5281/zenodo.12212762) |Dataset de imagens sintéticas com avatares realizando diferentes poses. Sintetizado para simular a captura com uma OAK-D. Contém anotação de keypoints 2D e 3D.
 
-Os dados serão sintetizados utilizando o motor de jogos Unity, que possui desenvolvido o pacote "Perception" para a geração de dados sintéticos [4]. Ela permitirá simular a configuração do dispositivo real e aplicando randomizações que julgarmos necessárias, tentando mitigar os efeitos da mudança do domínio virtual para real. Para a geração de "pessoas virtuais" utilizaremos o pacote "SyntheticHumans" [5].
+Os dados utilizados foram sintetizados utilizando o motor de jogos Unity, que possui desenvolvido o pacote "Perception" para a geração de dados sintéticos [4]. Ele simula a configuração do dispositivo real e aplican randomizações que julgarmos necessárias, tentando mitigar os efeitos da mudança do domínio virtual para real. Para a geração de "pessoas virtuais" utilizamos o pacote "SyntheticHumans" [5].
 
-São planejadas as randomizações: 
+Foram realizadas as randomizações: 
 - Geração procedural de "pessoas virtuais"
-- Pose da ‘pessoa virtual’
-- Ruído aditivo na pose dos sensores
-- Texturas de fundo
-- Luz
-- Parâmetros intrínsecos das câmeras
-    - Foco
-    - Tamanho do sensor
+- Pose da pessoa virtual
+- Posicionamento da pessoa virtual
+- Posicionamento, rotação, textura e hue de objetos (ruído)
+- Câmera
+  - Pose relativa entre as câmeras
+  - Foco
+  - Tamanho do sensor
+  - Abertura
+  - Lens shift
 
-Cada entrada no conjunto de dados será composto de três imagens, uma para cada câmera, com apenas uma pessoa em cena e keypoints no espaço 2D e 3D anotados para cada câmera. Outros metadados para análise poderão ser obtidos. Poderemos gerar quantos dados forem necessários, mas iremos começar gerando um dataset de por volta de 6400 entradas. As imagens serão salvas em formato PNG, enquanto que outros dados serão em arquivo JSON. 
+Cada entrada no conjunto de dados será composto de três imagens, uma para cada câmera, com apenas uma pessoa em cena e keypoints no espaço 2D e 3D anotados para cada câmera. 
 
 O dataset é divivido nos seguintes conjuntos:
 
@@ -59,6 +61,14 @@ Scenario3|StrongUniform|Teste|Parâmetros da câmera com randomização aditiva 
 Scenario4|Fixed-Test|Teste|Parâmetros da câmera fixos
 
 Uma descrição mais detalhada do protocolo de geração pode ser obtido em [OAK-D Synthetic Pose Dataset Generation Protocol](https://github.com/EltonCN/IA904-2024S1/blob/7b13886703576c74ecca8f1b1dd751d36a8c1896/projetos/3DStereoBodyPoseEstimation/data/OAK-D%20Synthetic%20Pose%20Dataset%20Generation%20Protocol.pdf).
+
+Para o uso durante treino, o dataset é divido em 3 conjuntos:
+
+Conjunto de treino | Conjuntos do dataset pertencentes
+-|-
+0 | Scenario0
+1 | Scenario0, Scenario1
+2 | Scenario0, Scenario1, Scenario2
 
 ## Ambiente Computacional
 > Descrever o ambiente/plataforma, bibliotecas e recursos computacionais utilizados, apresentando discussões, dicas e informações úteis para que outros possam utilizá-los.
@@ -75,17 +85,19 @@ Uma descrição mais detalhada do protocolo de geração pode ser obtido em [OAK
 ![Workflow de avaliação](assets/Pipeline-Avaliação.svg)
 
 ## Avaliação
-> Definição das métricas de avaliação do projeto.
-> Siga as três etapas sugeridas no artigo "Metrics Reloaded":
-> 1. Problem fingerprinting - mapear o problema para uma categoria específica
-> 2. Metric selection - identificar as métricas recomendadas para o problema/categoria, argumentar quais delas serão utilizadas e porque
-> 4. Metric application - escolher e justificar as implementações que serão utilizadas, discutir como as métricas devem ser interpretadas
-> 
-> Apresente e discuta os resultados de cada etapa, deixando claras as decisões tomadas a partir desses resultados e o racional envolvido nessas decisões. Tente também relacionar as discussões e decisões com os "pitfalls" específicos apresentados no artigo (como suas escolhas evitam os "pitfalls"?).
-> Você pode utilizar a plataforma [Metrics Reloaded](https://metrics-reloaded.dkfz.de/) para auxiliar neste processo. A plataforma gera um relatório que pode ser anexado a esta entrega, mas esse relatório **não** deve ser copiado e colado aqui, deve-se discutir as decisões tomadas a partir dele.
-> Mais informações podem ser encontradas nos materiais de apoio no Classroom (Métricas para validação de análise de imagens).
+
+Utilizamos o framework ["Metrics Reloaded"](https://metrics-reloaded.dkfz.de/) para tentar levantar possíveis métricas para o projeto. Porém, obtivemos que o nosso projeto está fora do escopo do framework, pois nossa categoria de problema (posições 3D de keypoints extraídas a partir de imagens) não é prevista por ele. Dito isso não pudemos obter métricas relevantes a partir dele.
+
+Decidimos utilizar como métricas o erro quadrático médio (MSE) e erro absoluto médio (MAE), considerando que os erros que queremos avaliar se encontram diretamente em um espaço geométrico 3D, sendo direto o que estas métricas simbolizam. Em especial, consideramos o uso do MAE divido a sua característica de lidar melhor com outliers, embora essa característica não foi avaliada durante o projeto pelos problemas que serão relatados.
+
+Outras métricas para avaliar corretude de esqueletos poderiam ser utilizadas, porém consideramos como mais relevante a posição espacial em si do keypoint, visto que sua corretude gera uma corretude no nível do esqueleto.
 
 ## Experimentos e Resultados
+
+### Dataset
+
+O dataset construído está disponibilizado no Zenodo: [OAK-D Synthethic Pose Dataset
+ ![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12212762.svg)](https://doi.org/10.5281/zenodo.12212762).
 
 Inicialmente, realizamos uma análise do dataset para avaliar possíveis vieses. Para isso, plotamos histogramas relevantes, que podem ser visualizados a seguir.
 
@@ -97,23 +109,80 @@ Inicialmente, realizamos uma análise do dataset para avaliar possíveis vieses.
 
 Observamos que o dataset apresenta um bom balanceamento em relação a características como altura, peso, etnia e sexo. Possuindo distribuições uniformes e abrangendo diferentes faixas de valores. No entanto, identificamos um desequilíbrio na distribuição por idade. A maioria dos dados está concentrada em faixas etárias adultas, o que pode afetar a generalização do modelo para outras faixas etárias.
 
-> Descrição dos experimentos e resultados mais importantes.
-> Apresente os resultados da forma mais rica possível, com gráficos e tabelas. Mesmo que o seu código rode online em um notebook, apresente o link para execução online, mas copie para esta parte a figura estática.
+### Treino
+
+As métricas de treino dos modelos podem ser visualizadas no projeto [IA904-OAKD3DKeypoint](https://wandb.ai/eltoncn/IA904-OAKD3DKeypoint?nw=nwusereltoncn) no "Weights and Biases".
+
+É possível baixar os modelos treinados utilizando:
+
+```python
+import wandb
+run = wandb.init()
+artifact = run.use_artifact('eltoncn/IA904-OAKD3DKeypoint/model:VERSION', type='model')
+artifact_dir = artifact.download()
+```
+
+Trocando "VERSION" pela versão do modelo ("0_mse", "0_mae", "1_mse", "1_mae", "2_mse", "2_mae").
+
+### Avaliação
+
+A partir das métricas dos modelos treinados nos datasets, obtivemos os resultados:
+
+Média da perda dos modelos em relação a métrica utilizada durante o treino:
+
+![](assets/evaluation/MeanLoss-TrainVsEvaluation.png)
+
+Média da perda dos modelos em todos os cenários (não ponderada pelo tamanho do cenário):
+
+![](assets/evaluation/MeanLoss-Scenarios.png)
+
+Todas as perdas dos modelos, por cenário. Células acima da linha azul significa que é a perda em um conjunto utilizado durante o treino.
+
+![](assets/evaluation/TestLoss.png)
+
+Exemplo de predição:
+
+![](assets/evaluation/PredictionExample.png)
+
+
+Os [gráficos gerados ![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12524909.svg)](https://doi.org/10.5281/zenodo.12524909) e [métricas de avaliação![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12524683.svg)](https://doi.org/10.5281/zenodo.12524683) foram disponibilizados no Zenodo.
+
+
 
 ## Discussão
-> Discussão dos resultados. Relacionar os resultados com as perguntas de pesquisa ou hipóteses avaliadas.
-> A discussão dos resultados também pode ser feita opcionalmente na seção de Resultados, na medida em que os resultados são apresentados. Aspectos importantes a serem discutidos: É possível tirar conclusões dos resultados? Quais? Há indicações de direções para estudo? São necessários trabalhos mais profundos?
 
-O maior problema a ser enfrentado será a transferência do modelo do domínio sintético para o real, o que poderá levar a necessidade iterativa de diversificação das imagens geradas.
+Obsevando os resultados, poderíamos indicar que o uso da métrica "MSE" durante o treino gerou resultados melhores do que a métrica "MAE", mesmo ao cruzar as métricas na avaliação. Além disso, a randomização nos dados não gerou o resultado esperado, visto que os modelos possuem erros altos mesmo no dataset de teste sem randomização (4). Todos os erros são muito altos para a aplicação, com o menor erro médio sendo de 18 cm.
+
+Porém, ao analisar novamente o código, em especial o [código do dataset](src/train/dataset.py)#120:
+
+```python
+keypoints_3d = df.iloc[[1]]["keypoints_3d"].values[0]
+```
+
+onde os keypoints para gerar o sample do dataset, ou seja, o target do modelo, é fixado para a segunda linha do dataset filtrado pelo cenário. Logo, o target do modelo está incorreto, invalidando as conclusões obtidas.
+
 
 ## Conclusão
-> Destacar as principais conclusões obtidas no desenvolvimento do projeto.
-> Destacar os principais desafios enfrentados.
-> Principais lições aprendidas.
+
+Infelizmente, poucas conclusões podem ser obtidas dos treinos e modelos em si.
+
+Entre aprendizados, conseguimos colocar em prática conceitos de reprodutibilidade como worflow e publicação de elementos utilizados (datasets e dados intermediários), assim como o datasheet. Entre ferramentas, pudemos aprender mais sobre o uso do "Weights and Biases", "Zenodo" e "MMPose". Ao construir e treinar o modelo, aprendemos sobre a construção de uma CNN com conexão residual, e a lidar com a paralelização da leitura dos dados no dataset.
+
+As dificuldades principais são relacionadas ao cronograma do projeto, que se mostrou de difícil execução durante o tempo proposto. Limitações de hardware também geraram problemas durante o treinamento do modelo.
+
 
 ## Trabalhos Futuros
-Para futuras pesquisas e desenvolvimentos, há algumas áreas que podem ser exploradas. Primeiramente, a etapa de refinamento da pose estimada pode ser aprimorada. Isso envolve ajustar os keypoints estimados para melhor se alinharem com a anatomia real do corpo humano. Além disso, a triangularização não linear, que foi planejada mas não foi realizada devido ao prazo, pode ser implementada para melhorar a precisão da estimativa 3D.
-Além das sugestões mencionadas anteriormente, existem outros pontos que podem ser explorados para aprimorar o estudo realizado. Primeiramente, testar diferentes arquiteturas de redes neurais pode ser interessante, visto que os resultados obtidos com a arquitetura utilizada não estão conforme o esperado. Além disso, considerar a coleta de dados além dos heatmaps, como informações de profundidade, pode enriquecer a estimativa 3D. Por fim, a realização da normalização dos dados, o que pode garantir uma maior consistência e precisão nas estimativas.
+
+A maior prioridade de um trabalho futuro seria a correção do código para repetir o treino dos modelos.
+
+Após isso, outros trabalhos futuros incluem:
+- Refinamento dos hiperparâmetros de treino
+- Exploração de outras arquiteturas para o modelo
+- Uso de dados além dos heatmaps
+- Normalização dos dados
+- Captura do dataset real para avaliação
+- Implementação de avaliação comparativa com triangularização
+
 
 ## Referências
 [1] Zheng, Ce, et al. "Deep learning-based human pose estimation: A survey." ACM Computing Surveys 56.1 (2023): 1-37.
