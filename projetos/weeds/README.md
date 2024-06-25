@@ -23,9 +23,9 @@ O método utilizado neste trabalho é composto por: aquisição de dados, pré-p
 > |Base de Dados | Endereço na Web | Resumo descritivo
 > |----- | ----- | -----
 > *Weeds Computer Vision Project* | https://universe.roboflow.com/augmented-startups/weeds-nxe1w | Um conjunto de imagens de plantações com ervas daninhas que pode facilmente confundir os modelos de detecção de objetos devido à semelhança das ervas daninhas em relação aos seus arredores [4]. Esse conjunto contém 3664 imagens de treinamento (87%), 359 de validação (9%) e 180 imagens de teste (4%). As imagens estão disponíveis em formato JPEG, coloridas e com resolução de 416x416 píxeis.
-> *Pessoal* | <span style="color:red">(projetos/weeds/data/guys)</span>. | Um conjunto de 20 imagens de vegetação distintas em formato JPEG coloridas, tiradas a partir de um Samsung A71 e de um Iphone 11 em varios terrenos.
+> *Pessoal* | https://github.com/mapovoa/IA904-2024S1/tree/main/projetos/weeds/data/guys | Um conjunto de 20 imagens de vegetação distintas em formato JPEG coloridas, tiradas a partir de um Samsung A71 e de um Iphone 11 em varios terrenos.
 
-Os dados do Weeds Computer Vision Project estão disponiveis no link da própria tabela, devido ao tamanho do dataset nao ser suportado pelo GitHub, para chegar na sua versão processada basta usa o script disponibilizado em <span style="color:red">(projetos/weeds/src/process.py)</span> um exemplo desse processamento pode ser visto em <span style="color:red">(projetos/weeds/notebooks/removing_noise_from_images.ipynb)</span>.
+Os dados do Weeds Computer Vision Project estão disponiveis no link da própria tabela, devido ao tamanho do dataset nao ser suportado pelo GitHub, para chegar na sua versão processada basta usa o script disponibilizado em https://github.com/mapovoa/IA904-2024S1/blob/main/projetos/weeds/src/process.py um exemplo desse processamento pode ser visto em https://github.com/mapovoa/IA904-2024S1/blob/main/projetos/weeds/notebooks/removing_noise_from_images.ipynb.
 
 ## Ambiente Computacional
 
