@@ -19,7 +19,42 @@ O objetivo deste projeto é desenvolver um sistema capaz de identificar e interp
 
 ## Metodologia
 
-Estamos considerando duas abordagens principais para o desenvolvimento do sistema: uma envolve a detecção de mãos seguida pela classificação dos gestos a partir das regiões de interesse (ROI) detectadas; a outra explora o uso de modelos de detecção e classificação integrados, como YOLO. A escolha final dependerá de análises de viabilidade, considerando as características do dataset disponível, e a necessidade de eventualmente converter este dataset para um formato adequado como COCO para modelos como YOLO. Adicionalmente, consideraremos a necessidade de um pré-processamento das imagens para melhorar a visibilidade em condições subaquáticas desafiadoras, como baixo contraste, águas turvas e iluminação variada. Estamos abertos a explorar a abordagem que melhor se encaixe às necessidades e limitações do projeto pegando en conta que o modelo deveria ser embarcável no robô subaquático.
+O desenvolvimento do sistema de detecção e classificação de gestos subaquáticos foi conduzido através de duas abordagens principais: (1) uma abordagem baseada na detecção de mãos seguida pela classificação dos gestos a partir das regiões de interesse (ROI) detectadas e (2) uma abordagem que explora o uso de modelos de detecção e classificação integrados, especificamente o YOLOv8. Ambas as abordagens utilizaram o mesmo dataset de teste para garantir uma comparação justa dos resultados obtidos.
+
+### Detecção de Mãos e Classificação de Gestos
+
+**Descrição**: Nesta abordagem, inicialmente as mãos dos mergulhadores foram detectadas nas imagens utilizando uma arquitetura Shallow U-Net. As regiões de interesse (ROIs) contendo as mãos foram então extraídas e alimentadas em uma rede neural convolucional (CNN) para a classificação dos gestos.
+
+**Justificativa Teórica**: Esta abordagem foi escolhida com base na hipótese de que a detecção de uma única classe (mão) poderia ser mais robusta do que a detecção direta de múltiplas classes de gestos. Uma vez que as mãos são detectadas com precisão, a classificação dos gestos a partir das ROIs se torna um problema mais localizado e específico, potencialmente melhorando a precisão geral do sistema. A U-Net, conhecida por sua eficiência em segmentação de imagens, foi utilizada para garantir a detecção precisa das mãos, enquanto a CNN foi empregada para aproveitar sua eficácia em tarefas de classificação de imagens.
+
+**Viabilidade**: Utilizamos um dataset contendo imagens estéreo de mergulhadores realizando diversos gestos. A preparação do dataset envolveu a combinação de arquivos CSV de verdadeiros positivos e negativos, filtragem de imagens duplicadas e criação de arquivos de anotação para cada imagem. O dataset foi dividido em conjuntos de treino, validação e teste. A Shallow U-Net foi treinada para segmentar as mãos nas imagens, e a CNN foi treinada para classificar os gestos a partir das ROIs extraídas.
+
+**Ferramentas e Técnicas Utilizadas**:
+
+- **Shallow U-Net**: Utilizada para a segmentação das mãos.
+- **CNN**: Utilizada para a classificação das ROIs em gestos específicos.
+- **Frameworks**: Pytorch foi utilizado para implementar e treinar os modelos.
+- **Pré-processamento de Imagens**: Técnicas de aumento de dados como rotação, espelhamento e ajuste de contraste foram aplicadas para melhorar a robustez do modelo.
+
+### Modelo Integrado de Detecção e Classificação (YOLOv8)
+
+**Descrição**: Utilizamos o modelo YOLOv8, um modelo de detecção de objetos que realiza simultaneamente a detecção e a classificação dos gestos subaquáticos em uma única etapa. O YOLOv8 nano foi escolhido devido ao seu tamanho reduzido e eficiência computacional, adequados para aplicações embarcadas.
+
+**Justificativa Teórica**: O YOLO (You Only Look Once) é uma família de modelos de detecção de objetos conhecida por sua capacidade de realizar detecção e classificação em tempo real com alta precisão. A versão YOLOv8 nano foi escolhida por equilibrar desempenho e eficiência computacional, sendo especialmente útil para aplicações onde os recursos de hardware são limitados, como em robôs subaquáticos.
+
+**Viabilidade**: O dataset foi convertido para um formato compatível com YOLO, o que incluiu a normalização das coordenadas de ROI e a criação de arquivos de anotação no formato YOLO. O modelo YOLOv8 nano foi então treinado utilizando este dataset, e sua performance foi avaliada em termos de precisão, recall e mAP (mean Average Precision).
+
+**Ferramentas e Técnicas Utilizadas**:
+
+- **YOLOv8 nano**: Utilizado para a detecção e classificação integrada de gestos.
+- **Frameworks**: PyTorch e a biblioteca Ultralytics YOLO foram utilizados para implementar e treinar o modelo.
+- **Conversão do Dataset**: Scripts personalizados foram desenvolvidos para converter o dataset original para o formato necessário pelo YOLOv8.
+- **Treinamento e Validação**: O modelo foi treinado utilizando GPUs para acelerar o processo, com avaliação contínua em um conjunto de validação para ajustar hiperparâmetros e prevenir overfitting.
+
+### Utilização do Mesmo Dataset de Teste
+
+Ambas as abordagens, Shallow U-Net + CNN e YOLOv8 nano, utilizaram o mesmo dataset de teste para garantir uma comparação justa e direta dos resultados obtidos. Este procedimento permitiu avaliar as performances relativas das duas abordagens em condições idênticas, facilitando a análise comparativa e a interpretação dos resultados.
+
 
 ## Bases de Dados e Evolução
 
@@ -60,30 +95,83 @@ A distribuição do conjunto de dados é a seguinte:
 <details>
 <summary title="Click to Expand/Collapse">Exemplos de gestos</summary>
 
-| Comando    | Exemplo                                                        | Comando     | Exemplo                                                        |
-|------------|-----------------------------------------------------------------|-------------|----------------------------------------------------------------|
-| Start_comm | ![Image 1](https://github.com/RTrombini/IA904-2024S1/assets/114251488/63cb1e3e-c998-46da-9484-ba1113b858d9) | End_comm   | ![Image 2](https://github.com/RTrombini/IA904-2024S1/assets/114251488/c7a5043d-ce04-45c4-ac73-e42aeef2d768) |
-| Up         | ![Image 3](https://github.com/RTrombini/IA904-2024S1/assets/114251488/43571b44-7074-4fb7-b297-711dce567490) | Down       | ![Image 4](https://github.com/RTrombini/IA904-2024S1/assets/114251488/f5f0f983-d4b3-4fc7-aa8a-2fea37aea9ea) |
-| Photo      | ![Image 5](https://github.com/RTrombini/IA904-2024S1/assets/114251488/a1bec6b3-8835-4b3a-9e5b-62013569f704) | Backwards  | ![Image 6](https://github.com/RTrombini/IA904-2024S1/assets/114251488/f56b2498-95f5-4f76-9683-a3a8859f0e2b) |
-| Carry      | ![Image 7](https://github.com/RTrombini/IA904-2024S1/assets/114251488/16bf799f-3a2d-4818-927e-7c498dd98068) | Boat       | ![Image 8](https://github.com/RTrombini/IA904-2024S1/assets/114251488/8d63032f-3b46-4b97-9e64-5f6b7159e666) |
-| Here       | ![Image 9](https://github.com/RTrombini/IA904-2024S1/assets/114251488/42423ef1-88d0-4c36-af07-e3bdc64e8bdd) | Num_delimiter | ![Image 10](https://github.com/RTrombini/IA904-2024S1/assets/114251488/a36ced6b-ada7-4fc1-ba31-3f0f1224f334) |
-| One        | ![Image 11](https://github.com/RTrombini/IA904-2024S1/assets/114251488/5607f938-dbc3-461f-96dc-6d7dd9e3d65b) | Two        | ![Image 12](https://github.com/RTrombini/IA904-2024S1/assets/114251488/b27d0738-14b2-4986-8600-9cba39e58588) |
-| Three      | ![Image 13](https://github.com/RTrombini/IA904-2024S1/assets/114251488/f48fe56a-05d5-44c9-8c00-f1dfe7e7ee3d) | Four       | ![Image 14](https://github.com/RTrombini/IA904-2024S1/assets/114251488/3f394f60-9fb5-4994-bdf5-78e773c5f25f) |
-| Five       | ![Image 15](https://github.com/RTrombini/IA904-2024S1/assets/114251488/d745bccd-2110-479c-b675-e4d53a7554e4) |
+| Comando        | Exemplo                                                        | Comando         | Exemplo                                                        |
+|----------------|----------------------------------------------------------------|-----------------|----------------------------------------------------------------|
+| Start_comm     | ![start_com](https://github.com/RTrombini/IA904-2024S1/assets/114251488/15a2e9fe-3323-4f69-8f85-c768e96263e2) | Up              | ![up](https://github.com/RTrombini/IA904-2024S1/assets/114251488/569e165b-c0de-491f-9ee8-b877e10c0654) |
+| Down           | ![down](https://github.com/RTrombini/IA904-2024S1/assets/114251488/45c43049-c052-40b2-aade-cc9c31cc8e6c) | Photo           | ![photo](https://github.com/RTrombini/IA904-2024S1/assets/114251488/a3c7c7b7-aec2-45b2-b7c1-4239dd83ab94) |
+| Backwards      | ![backwards](https://github.com/RTrombini/IA904-2024S1/assets/114251488/ec93ee23-5fba-4591-90c5-45f90677df42) | Carry           | ![carry](https://github.com/RTrombini/IA904-2024S1/assets/114251488/5f2909c4-3150-4526-b201-d604d96ab4ad) |
+| Boat           | ![boat](https://github.com/RTrombini/IA904-2024S1/assets/114251488/1de76e5d-877a-4d83-9d5c-3427b06b5227) | Here            | ![here](https://github.com/RTrombini/IA904-2024S1/assets/114251488/f34a67ee-be11-48d3-a672-32984a6fc3e5) |
+| Num_delimiter  | ![num_delimiter](https://github.com/RTrombini/IA904-2024S1/assets/114251488/378f3cb7-80c8-4f83-8bc1-7afc6fc6a60a) | One             | ![one](https://github.com/RTrombini/IA904-2024S1/assets/114251488/39d3c371-6d82-4080-a5a1-4a38187641c7) |
+| Two            | ![two](https://github.com/RTrombini/IA904-2024S1/assets/114251488/9e38bcfe-a82e-4d9a-bd7e-2aad0fcb830c) | Three           | ![three](https://github.com/RTrombini/IA904-2024S1/assets/114251488/e986f257-9feb-41fa-b2fe-b3ff8580a946) |
+| Four           | ![four](https://github.com/RTrombini/IA904-2024S1/assets/114251488/3fbfa2ac-60ff-4d21-9881-79f594d8df5a) | Five            | ![five](https://github.com/RTrombini/IA904-2024S1/assets/114251488/bb105794-46b7-481b-9589-55af5a0e77e0) |
+| End_comm       | ![end_com](https://github.com/RTrombini/IA904-2024S1/assets/114251488/da66fa64-eaf6-41ce-81a0-6f9022384fce) |                 |                                                                |
+
 
 </details>
 
 
-## Ferramentas
+## Ambiente computacional
 
-- Linguagem de programação principal: Python
+### Ambiente
+
+Python foi escolhido como linguagem de programação para treinar e avaliar os modelos, se utilizaram principalmente Jupyter Notebooks para permitir uma leitura fácil e reproducibilidade dos modelos.
+
+#### Ambiente para treinamento do modelo SUN-CNN
+A versão utilizada para o treinamento do modelo SUN-CNN foi Python 3.12.2.
+
+#### Ambiente para treinamento do modelo YOLO-v8
+A versão utilizada para o treinamento do modelo YOLO-v8 foi Python 3.11.9.
+
+### Bibliotecas
+ 
 - Bibliotecas para pré-processamento de imagens: OpenCV, Pillow (PIL), Numpy
 - Bibliotecas para aumento de imagens: Torchvision
 - Bibliotecas para Deep Learning: PyTorch, YOLOv8
-- Biblioteca para manipulação de dados: pandas
-- Bibliotecas para avaliação dos modelos: PyTorch e Sklearn (métricas), Matplotlib (visualização)
+- Biblioteca para manipulação de dados: Pandas
+- Bibliotecas para obtenção de métricas: Pytorch e Sklearn
+- Bibliotecas para visualização de dados: Matplotlib e Seaborn
+
+#### Versões das bibliotecas usadas para o treinamento do modelo SUN-CNN
+- OpenCV 4.9.0
+- Pillow (PIL) 10.3.0
+- Numpy 1.26.4
+- Torchvision 0.17.1+cu118
+- CUDA toolkit 11.8
+- PyTorch 2.2.1+cu118
+- Pandas 2.2.1
+- Sklearn 1.4.1.post1
+- Matplotlib 3.8.3 
+- Seaborn 0.13.2
+
+#### Versões das bibliotecas usadas para o treinamento do modelo YOLO-v8
+- OpenCV 4.9.0.80
+- Pillow 10.3.0
+- Numpy 1.26.4
+- Torchvision 0.18.0+cu121
+- Pandas 2.0.1
+- Sklearn 1.5.0
+- Matplotlib 3.9.0
+- Seaborn 0.13.2
+- CUDA toolkit 11.8
+- PyTorch 2.2.1+cu118
+
+### Recursos computacionais
+
+#### Treinamento do modelo SUN-CNN
+O treinamento foi realizado numa máquina local com uma gpu NVIDIA 2060 de 6 GB de VRAM em um computador com um processador Ryzen 9 4900HS octacore e 16 GB de RAM para o sistema.
+
+#### Treinamento do modelo YOLO-v8
+O treinamento foi realizado numa máquina local com uma gpu NVIDIA 4070 de 12 GB de VRAM em um computador com um processador Ryzen 5 5600 hexacore e 32 GB de RAM para o sistema. 
+
+### Discussão e Dicas para implementação
 
 ## Workflow
+
+
+A continuação se apressenta o workflow seguido pelo grupo, onde primeiro foi feita uma exploração dos dados divulgados pelo grupo CADDY, a partir dos quais foram obtidos insights sobre as abordagens que se poderiam ser tomadas para resolver o problema, decidindo fazer uma comparação entre dois modelos de Deep Learning. Finalmente, depois de iterações e refinamentos dos modelos se realizou uma avaliação com um conjunto de teste específico para os dois modelos.
+
+![workflow](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/workflow.png)
+
 
 ### Detecção com YOLO
 
@@ -107,27 +195,31 @@ Cada imagem no dataset era acompanhada por um arquivo CSV com as seguintes infor
 
 ##### Conversão do Dataset:
 
-Para utilizar o YOLOv8, o dataset precisava ser convertido para um formato compatível. Este processo incluiu várias etapas:
+Para utilizar o YOLOv8, o dataset precisava ser convertido para um formato compatível. Este processo incluiu várias etapas e foi realizado no notebook `dataset_converter.ipynb`:
 
 ###### Combinação dos CSVs True Positives e True Negatives:
-- Os CSVs de true positives e true negatives foram combinados em um único CSV.
-- Adicionamos "Negative" como uma classe e ajustamos os IDs de classe conforme necessário.
+- **Ação:** Os CSVs de true positives e true negatives foram combinados em um único CSV.
+- **Motivo:** Facilitar o processamento unificado das anotações e garantir que todas as classes estejam representadas no mesmo arquivo.
 
 ###### Filtragem de Imagens:
-- Apenas imagens com anotações válidas foram mantidas.
-- Imagens duplicadas (esquerda e direita) foram removidas para evitar overfitting. Apenas imagens da direita foram mantidas.
+- **Ação:** Apenas imagens com anotações válidas foram mantidas.
+- **Motivo:** Garantir que o dataset final contenha apenas imagens relevantes para o treinamento e evitar dados ruidosos.
+- **Ação:** Imagens duplicadas (esquerda e direita) foram removidas para evitar overfitting. Apenas imagens da direita foram mantidas.
+- **Motivo:** Reduzir a redundância e o volume de dados, mantendo a diversidade necessária para um treinamento eficaz.
 
 ###### Criação de Arquivos de Anotação YOLO:
-- Convertendo as coordenadas de ROI para o formato YOLO.
-- Salvando as anotações em arquivos `.txt` no formato YOLO.
+- **Ação:** Convertendo as coordenadas de ROI para o formato YOLO.
+  - Formato YOLO: `<class_id> <x_center> <y_center> <width> <height>`
+  - Coordenadas foram normalizadas para estar entre 0 e 1.
+- **Motivo:** Adaptar as anotações ao formato esperado pelo modelo YOLO.
+- **Ação:** Salvando as anotações em arquivos `.txt` no formato YOLO.
+- **Motivo:** Compatibilizar o formato das anotações com os requisitos do YOLO.
 
 ###### Divisão em Conjuntos de Treino, Validação e Teste:
-- O dataset foi dividido em 80% para treino, 10% para validação e 10% para teste.
-- As imagens e anotações correspondentes foram movidas para diretórios específicos.
-
-###### Diagrama de Fluxo para `dataset_converter.ipynb`:
-
-![dataset_converter](https://github.com/RTrombini/IA904-2024S1/assets/114251488/cc7c1d8c-361b-4658-be60-bcae8ca3f456)
+- **Ação:**  Esse dataset foi dividido em 76.5% para treino, 10% para validação e 13.5% para teste.
+- **Motivo:** Garantir que o modelo seja treinado, validado e testado de maneira adequada, permitindo a avaliação de sua performance em dados não vistos durante o treinamento.
+- **Ação:** As imagens e anotações correspondentes foram movidas para diretórios específicos (`train`, `val`, `test`).
+- **Motivo:** Organizar o dataset de acordo com as convenções do YOLO para facilitar o treinamento e a inferência.
 
 #### 2. Estrutura do Dataset Final
 
@@ -149,14 +241,15 @@ Dataset/
 └── dataset.yaml
 ```
 
+
 ###### Formato dos Arquivos de Anotação:
 
-Cada arquivo .txt de anotação segue o formato YOLO:
+Cada arquivo `.txt` de anotação segue o formato YOLO:
 
 ```
 <class_id> <x_center> <y_center> <width> <height>
-
 ```
+
 
 ### 3. Treinamento da YOLOv8 Nano
 
@@ -167,30 +260,77 @@ Utilizou-se o modelo pré-treinado YOLOv8 nano (`yolov8n.pt`).
 **Parâmetros de treinamento:**
 - **Épocas:** 100
 - **Tamanho das imagens:** 640x640 pixels
+- **Batch size:** 16
+- **Learning rate:** 0.01
+- **Otimização:** SGD com momentum de 0.9
 
-**Diagrama de Fluxo para `yolo_training.ipynb`:**
-
-![train](https://github.com/RTrombini/IA904-2024S1/assets/114251488/73770e7c-df2e-42ed-ad79-981c90211541)
+O treinamento foi realizado no notebook `yolo_training.ipynb`.
 
 ### 4. Realizar Inferência com o Modelo Treinado
 
-**Diagrama de Fluxo para `yolo_inference.ipynb`:**
+A inferência foi realizada no notebook `yolo_inference.ipynb`, onde as imagens de teste foram processadas pelo modelo treinado para avaliar a performance em condições não vistas durante o treinamento.
 
-![inference](https://github.com/RTrombini/IA904-2024S1/assets/114251488/3517f803-35f6-4b87-8cfc-7fb5b21d28c6)
 
-### Relação entre os Três Notebooks
 
-**Diagrama Geral de Relação entre os Três Notebooks:**
+## Avaliação
 
-![general](https://github.com/RTrombini/IA904-2024S1/assets/114251488/55a00f0b-0506-4ec8-a7eb-49549c96aa27)
+### Problem Fingerprinting
 
-Este fluxo de trabalho mostra como os três notebooks se conectam e interagem entre si no processo completo de detecção com YOLOv8.
+**Objetivo:**
+Mapear o problema para uma categoria específica, capturando todas as propriedades relevantes que influenciam a seleção de métricas.
 
-## Experimentos e Resultados preliminares
+**Domínio de Aplicação:**
+Análise de imagens subaquáticas para detecção e classificação de gestos de mão.
+
+**Tipo de Tarefa:**
+Detecção de objetos e classificação.
+
+**Variabilidade das Condições:**
+- **Iluminação:** As condições de iluminação subaquática podem variar significativamente, afetando a qualidade da imagem.
+- **Visibilidade:** A clareza da água e a presença de partículas podem impactar a visibilidade.
+
+**Desbalanceamento de Classes:**
+Algumas classes de gestos são mais frequentes que outras, o que pode levar a um desbalanceamento no conjunto de dados.
+
+**Requisitos de Precisão e Recall:**
+- **Alta Precisão:** Necessário para minimizar falsos positivos, onde um gesto é detectado erroneamente.
+- **Alto Recall:** Necessário para minimizar falsos negativos, onde um gesto presente na imagem não é detectado.
+
+### Metric Selection
+
+**Objetivo:**
+Determinar um conjunto de métricas pertinentes ao problema/categoria.
+
+**Métricas Selecionadas:**
+- **Precisão (Precision):** Mede a proporção de detecções corretas entre todas as detecções realizadas pelo modelo.
+- **Revocação (Recall):** Mede a proporção de detecções corretas entre todas as instâncias reais dos gestos nas imagens.
+- **mAP50 (Mean Average Precision at IoU=0.50):** Média da precisão média para cada classe, considerando um limiar de IoU de 0.50.
+- **mAP50-95 (Mean Average Precision at IoU=0.50:0.95):** Média da precisão média para cada classe, considerando múltiplos limiares de IoU, de 0.50 a 0.95.
+- **F1 Score:** Combina precisão e recall em uma única métrica, útil para medir o equilíbrio entre ambos.
+- **IoU (Intersection over Union):** Mede a sobreposição entre as caixas delimitadoras previstas e as reais, usada para avaliar a qualidade da detecção.
+
+### Metric Application
+
+**Objetivo:**
+Recomendações relacionadas à implementação e interpretação das métricas.
+
+**Implementação:**
+- **Ferramentas:** Utilização do framework YOLOv8, que já possui implementações integradas para calcular as métricas de detecção.
+- **Validação Cruzada:** Dividir o conjunto de dados em treinamento, validação e teste para garantir que o modelo generalize bem.
+- **Ajuste de Hiperparâmetros:** Ajustar hiperparâmetros do modelo, como a taxa de aprendizado, para otimizar as métricas selecionadas.
+
+**Interpretação:**
+- **Precisão e Recall:** Analisar a precisão e recall para identificar possíveis trade-offs e ajustar o modelo conforme necessário.
+- **mAP50 e mAP50-95:** Utilizar estas métricas para obter uma visão geral da performance do modelo em diferentes classes e limiares de IoU.
+- **Análise de Falsos Positivos/Negativos:** Examinar casos de falsos positivos e negativos para identificar padrões e ajustar a estratégia de treinamento ou coleta de dados.
+
+
+
+## Experimentos e Resultados
 
 ### Experimento com YOLOv8
 
-Realizamos um experimento com o modelo YOLOv8 para avaliar a dificuldade de detectar as mãos dos mergulhadores nas imagens subaquáticas. Para nossa surpresa, a detecção de mãos foi muito bem-sucedida, mesmo nas imagens mais turvas e com baixa visibilidade. Motivados por esses resultados positivos, prosseguimos com o treinamento do modelo para a detecção de gestos específicos, separados em 16 classes (15 classes de gestos e uma classe sem gestos).
+Realizamos um experimento com o modelo YOLOv8 para avaliar a dificuldade de detectar as mãos dos mergulhadores nas imagens subaquáticas. Para nossa surpresa, a detecção de mãos foi muito bem-sucedida, mesmo nas imagens mais turvas e com baixa visibilidade. Motivados por esses resultados positivos, prosseguimos com o treinamento do modelo para a detecção de gestos específicos, separados em 17 classes (16 classes de gestos e uma classe sem gestos).
 
 #### Preparação do Dataset:
 
@@ -198,28 +338,51 @@ Realizamos um experimento com o modelo YOLOv8 para avaliar a dificuldade de dete
 - Para evitar overfitting, optamos por usar apenas metade das imagens, especificamente as imagens right. Como tínhamos imagens left e right devido ao uso de câmeras estéreo, essa escolha manteve a diversidade do dataset sem repetir dados.
 - Não aplicamos nenhum pré-processamento nas imagens neste teste, para observar os resultados da maneira mais crua possível.
 
-#### Treinamento:
 
-- O modelo YOLOv8 nano foi treinado com as imagens do dataset preparado.
-- O treinamento incluiu 100 épocas com imagens de 640x640 pixels.
+##### Treinamento da YOLOv8 Nano
+
+###### Divisão em Conjuntos de Treino, Validação e Teste:
+- Esse dataset foi dividido em 72% para treino, 10% para validação e 18% para teste.
+- O dataset foi preparado mantendo apenas as imagens da direita, eliminando duplicações das imagens estéreo.
+
+###### Aumento dos Dados
+As seguintes transformações foram aplicadas aos dados de treinamento utilizando as configurações padrão do YOLOv8:
+
+1. **Scale**: Redimensionamento aleatório das imagens.
+2. **Translation**: Translação das imagens.
+3. **Rotation**: Rotação aleatória das imagens.
+4. **Shear**: Aplicação de deformação nas imagens.
+5. **Horizontal Flip**: Inversão horizontal das imagens.
+
+###### Hiperparâmetros
+
+**Hiperparâmetros:**
+- **Batch size**: 16
+- **Tamanho das imagens**: 640x640 pixels
+- **Número de classes**: 17
+- **Épocas**: 100
+- **Learning rate inicial**: 0.01
 
 #### Resultados:
 
 - A detecção de gestos foi aceitável, com o modelo conseguindo identificar os diferentes gestos subaquáticos.
 - Resultados detalhados, incluindo tabelas de verdade e curvas ROC, serão adicionados posteriormente para explicar os resultados em detalhes.
 
+##### Curvas de perdas
+
+![loss para detecção](https://github.com/RTrombini/IA904-2024S1/assets/114251488/e1811cc0-ac4d-4caf-83f3-3ef053fdc03e)
+
+![loss para classificação](https://github.com/RTrombini/IA904-2024S1/assets/114251488/faf5dfa8-cdf0-4b94-b0d8-94b1374ee919)
+
+
+
 ##### Matriz de confusão:
-
-- Segue abaixo a matriz de confusão  com os valores absolutos da detecção no dataset de testes:
-
-![confusion_matrix](https://github.com/RTrombini/IA904-2024S1/assets/114251488/d86f3b33-a171-418c-a452-2c01fb2466da)
 
 - Segue abaixo a matriz de confusão  normalizada da detecção no dataset de testes:
 
 
 
-![confusion_matrix_normalized](https://github.com/RTrombini/IA904-2024S1/assets/114251488/cad0fa07-aafa-4ec9-932e-da977fee5961)
-
+![matriz_confusao](https://github.com/RTrombini/IA904-2024S1/assets/114251488/ff2a9f1f-528c-48ae-9c4b-1bb658bdfc6c)
 
 ##### Classes Corretamente Classificadas
 
@@ -227,171 +390,339 @@ Realizamos um experimento com o modelo YOLOv8 para avaliar a dificuldade de dete
 |-----------------|-----------------------|---------------------------------------------------------------------|
 | start_comm      | 100%                  | Todas as instâncias foram corretamente classificadas como start_comm. |
 | end_comm        | 100%                  | Todas as instâncias foram corretamente classificadas como end_comm.   |
-| up              | 100%                  | Todas as instâncias foram corretamente classificadas como up.         |
-| down            | 98%                   | 2% das instâncias foram erroneamente classificadas.                  |
-| photo           | 99%                   | Todas as instâncias foram corretamente classificadas como photo.      |
+| up              | 98%                  | 2% das instâncias foram erroneamente classificadas.        |
+| down            | 100%                   | Todas as instâncias foram corretamente classificadas como down.                 |
+| photo           | 100%                   | Todas as instâncias foram corretamente classificadas como photo.      |
 | backwards       | 98%                   | 2% das instâncias foram erroneamente classificadas.                  |
-| carry           | 100%                  | Todas as instâncias foram corretamente classificadas como carry.      |
-| boat            | 99%                   | Todas as instâncias foram corretamente classificadas como boat.       |
+| carry           | 99%                  | 1% das instâncias foram erroneamente classificadas.      |
+| boat            | 97%                   | 3% das instâncias foram erroneamente classificadas.       |
 | here            | 98%                   | 2% das instâncias foram erroneamente classificadas.                  |
-| mosaic          | 0%                    | não houveram instancias classificadas como mosaic                  |
-| num_delimiter   | 98%                   | 2% das instâncias foram erroneamente classificadas.                  |
-| one             | 97%                   | 3% das instâncias foram erroneamente classificadas.                  |
+| mosaic          | 100%                    | Todas as instâncias foram corretamente classificadas como mosaic.                  |
+| num_delimiter   | 100%                   | Todas as instâncias foram corretamente classificadas como num_delimiter.                  |
+| one             | 95%                   | 5% das instâncias foram erroneamente classificadas.                  |
 | two             | 100%                  | Todas as instâncias foram corretamente classificadas como two.        |
-| three           | 99%                   | 1% das instâncias foram erroneamente classificadas.                  |
-| four            | 97%                   | 3% das instâncias foram erroneamente classificadas.                  |
+| three           | 100%                   | Todas as instâncias foram corretamente classificadas como three.                 |
+| four            | 100%                   | Todas as instâncias foram corretamente classificadas como four.                 |
 | five            | 100%                  | Todas as instâncias foram corretamente classificadas como five.       |
 | negative        | 0%                    | As instâncias não  foram classificadas como negative.   |
 | background      | 100%                  | Todas as instâncias negative foram  classificadas como background. |
+
 
 ### Erros de Classificação
 
 | Classe    | Percentual de Erro | Observação                                            |
 |-----------|---------------------|-------------------------------------------------------|
-| down      | 2%                  | 2% das instâncias de down foram erroneamente classificadas.   |
+| up        | 2%                  | 2% das instâncias de up foram erroneamente classificadas.         |
 | backwards | 2%                  | 2% das instâncias de backwards foram erroneamente classificadas.|
-| mosaic    | 100%                  | 3% das instâncias de mosaic foram erroneamente classificadas.   |
-| three     | 1%                  | 1% das instâncias de three foram erroneamente classificadas.    |
+| carry     | 1%                  | 1% das instâncias de carry foram erroneamente classificadas.      |
+| boat      | 3%                  | 3% das instâncias de boat foram erroneamente classificadas.       |
+| one       | 5%                  | 5% das instâncias de one foram erroneamente classificadas.        |
 
 
 <details>
 <summary title="Click to Expand/Collapse">Exemplos de gestos</summary>
 
-| Comando            | Exemplo                                                        | Comando            | Exemplo                                                        |
-|--------------------|-----------------------------------------------------------------|--------------------|----------------------------------------------------------------|
-| Start_comm         | ![Image 1](https://github.com/RTrombini/IA904-2024S1/assets/114251488/e3baf444-2248-4fd9-a685-0f0018646604) | End_comm           | ![Image 2](https://github.com/RTrombini/IA904-2024S1/assets/114251488/92a3a846-bf6f-45bd-90ec-9bb845e7303c) |
-| Up                 | ![Image 3](https://github.com/RTrombini/IA904-2024S1/assets/114251488/e5fa9164-a62b-4943-88ca-97ba5a0d128e) | Down               | ![Image 4](https://github.com/RTrombini/IA904-2024S1/assets/114251488/b9bf5fd3-fca9-48ea-8d07-56c7d7625b36) |
-| Photo              | ![Image 5](https://github.com/RTrombini/IA904-2024S1/assets/114251488/be407c4a-f562-459f-90a4-1c282be64c3e) | Backwards          | ![Image 6](https://github.com/RTrombini/IA904-2024S1/assets/114251488/d3db314e-8c55-4fe5-8def-ea1d64aa11ec) |
-| Carry              | ![Image 7](https://github.com/RTrombini/IA904-2024S1/assets/114251488/88feb56e-8303-4f5f-a0e0-97aadcf2d816) | Boat               | ![Image 8](https://github.com/RTrombini/IA904-2024S1/assets/114251488/ecdd8bb3-418f-4fe6-91a1-28510a15b93e) |
-| Here               | ![Image 9](https://github.com/RTrombini/IA904-2024S1/assets/114251488/b0d8d429-0af2-4e1b-a841-04998398659b) | Num_delimiter      | ![Image 10](https://github.com/RTrombini/IA904-2024S1/assets/114251488/6154ce84-c3bc-4276-a4cb-51e16169f317) |
-| One                | ![Image 11](https://github.com/RTrombini/IA904-2024S1/assets/114251488/8e8c66a1-de9d-4035-9e93-9f5334c1203d) | Two                | ![Image 12](https://github.com/RTrombini/IA904-2024S1/assets/114251488/578c3f88-e4aa-44dc-b1f3-f354cd210616) |
-| Three              | ![Image 13](https://github.com/RTrombini/IA904-2024S1/assets/114251488/90468027-68cc-45b9-8cdc-ff050c44f061) | Four               | ![Image 14](https://github.com/RTrombini/IA904-2024S1/assets/114251488/395fc8ef-3304-495e-82a8-8e8702ac7e18) |
-| Five               | ![Image 15](https://github.com/RTrombini/IA904-2024S1/assets/114251488/ae38eb6f-331f-4e68-ae99-bc9a9866d01c) | Negative           | ![Image 16](https://github.com/RTrombini/IA904-2024S1/assets/114251488/9553fb1e-c831-4399-9740-7f6c0991d2f8) |
+| Comando        | Exemplo                                                        | Comando         | Exemplo                                                        |
+|----------------|----------------------------------------------------------------|-----------------|----------------------------------------------------------------|
+| Start_comm     | ![start_com](https://github.com/RTrombini/IA904-2024S1/assets/114251488/15a2e9fe-3323-4f69-8f85-c768e96263e2) | Up              | ![up](https://github.com/RTrombini/IA904-2024S1/assets/114251488/569e165b-c0de-491f-9ee8-b877e10c0654) |
+| Down           | ![down](https://github.com/RTrombini/IA904-2024S1/assets/114251488/45c43049-c052-40b2-aade-cc9c31cc8e6c) | Photo           | ![photo](https://github.com/RTrombini/IA904-2024S1/assets/114251488/a3c7c7b7-aec2-45b2-b7c1-4239dd83ab94) |
+| Backwards      | ![backwards](https://github.com/RTrombini/IA904-2024S1/assets/114251488/ec93ee23-5fba-4591-90c5-45f90677df42) | Carry           | ![carry](https://github.com/RTrombini/IA904-2024S1/assets/114251488/5f2909c4-3150-4526-b201-d604d96ab4ad) |
+| Boat           | ![boat](https://github.com/RTrombini/IA904-2024S1/assets/114251488/1de76e5d-877a-4d83-9d5c-3427b06b5227) | Here            | ![here](https://github.com/RTrombini/IA904-2024S1/assets/114251488/f34a67ee-be11-48d3-a672-32984a6fc3e5) |
+| Num_delimiter  | ![num_delimiter](https://github.com/RTrombini/IA904-2024S1/assets/114251488/378f3cb7-80c8-4f83-8bc1-7afc6fc6a60a) | One             | ![one](https://github.com/RTrombini/IA904-2024S1/assets/114251488/39d3c371-6d82-4080-a5a1-4a38187641c7) |
+| Two            | ![two](https://github.com/RTrombini/IA904-2024S1/assets/114251488/9e38bcfe-a82e-4d9a-bd7e-2aad0fcb830c) | Three           | ![three](https://github.com/RTrombini/IA904-2024S1/assets/114251488/e986f257-9feb-41fa-b2fe-b3ff8580a946) |
+| Four           | ![four](https://github.com/RTrombini/IA904-2024S1/assets/114251488/3fbfa2ac-60ff-4d21-9881-79f594d8df5a) | Five            | ![five](https://github.com/RTrombini/IA904-2024S1/assets/114251488/bb105794-46b7-481b-9589-55af5a0e77e0) |
+| End_comm       | ![end_com](https://github.com/RTrombini/IA904-2024S1/assets/114251488/da66fa64-eaf6-41ce-81a0-6f9022384fce) |                 |                                                                |
+
 
 </details>
 
+##### Métricas de Detecção
+
+**Resultados Obtidos:**
+- **Precisão (Precision):** 0.913
+- **Sensibilidade:** 0.928
+- **mAP50 (Mean Average Precision at IoU=0.50):** 0.932
+- **mAP50-95 (Mean Average Precision at IoU=0.50:0.95):** 0.693
+
+**Discussão:**
+Os resultados obtidos indicam um bom desempenho do modelo YOLOv8 na detecção e classificação de gestos de mão em imagens subaquáticas. A alta precisão e recall demonstram a eficácia do modelo em minimizar tanto falsos positivos quanto falsos negativos. As métricas mAP50 e mAP50-95 fornecem uma visão abrangente da performance do modelo em diferentes limiares de IoU, mostrando que o modelo é robusto para várias condições de detecção.
+
+### Modelo SUN-CNN
+
+#### Experimentos
+
+Apartir dos resultados obtidos com a YOLO-v8 nano, apareceu a pergunta de se era possível obter resultados no mesmo nível com menos parâmetros treináveis, pegando en conta que a ideia do projeto é que o modelo seja embarcável num robô subaquático. Nesse sentido, o uso de uma rede de segmentação mais uma rede de classificação deveria realizar de maneira satisfátoria essa tarefa. Nós escolhimos uma variação da U-net original, chamada Shallow U-net, pois tem menos camadas de profundidade para o encoder-decoder, assim mesmo tem menos camadas de filtros, reduzindo o número de parâmetros desde o início. No caso da rede CNN, se armou uma estrutura com 4 camadas convolucionais com batch normalization e função de ativação ReLU para fazer a extracção de características das imagens filtradas pela Shallow U-net e umas camadas Fully connected com regularização Dropout para aumentar a sua generalização e fazer a classificação do gesto feito pelo mergulhador.
+
+##### Arquitetura da Shallow U-Net
+
+| Layer (type)         | Output Shape             | Param #  |
+|----------------------|--------------------------|----------|
+| Conv2d-1             | [-1, 32, 160, 212]       | 896      |
+| Conv2d-2             | [-1, 32, 160, 212]       | 9,248    |
+| MaxPool2d-3          | [-1, 32, 80, 106]        | 0        |
+| DownConv-4           | [[-1, 32, 80, 106], [-1, 32, 160, 212]] | 18,496   |
+| Conv2d-5             | [-1, 64, 80, 106]        | 8,496    |
+| Conv2d-6             | [-1, 64, 80, 106]        | 36,928   |
+| MaxPool2d-7          | [-1, 64, 40, 53]         | 0        |
+| DownConv-8           | [[-1, 64, 40, 53], [-1, 64, 80, 106]] | 73,856   |
+| Conv2d-9             | [-1, 128, 40, 53]        | 18,496   |
+| Conv2d-10            | [-1, 128, 40, 53]        | 147,584  |
+| DownConv-11          | [[-1, 128, 40, 53], [-1, 128, 40, 53]] | 147,584  |
+| ConvTranspose2d-12   | [-1, 64, 80, 106]        | 32,832   |
+| Conv2d-13            | [-1, 64, 80, 106]        | 73,792   |
+| Conv2d-14            | [-1, 64, 80, 106]        | 36,928   |
+| UpConv-15            | [-1, 64, 80, 106]        | 0        |
+| ConvTranspose2d-16   | [-1, 32, 160, 212]       | 8,224    |
+| Conv2d-17            | [-1, 32, 160, 212]       | 18,464   |
+| Conv2d-18            | [-1, 32, 160, 212]       | 9,248    |
+| UpConv-19            | [-1, 32, 160, 212]       | 0        |
+| Conv2d-20            | [-1, 2, 160, 212]        | 66       |
+
+**Total params**: 466,562
+**Trainable params**: 466,562
+**Non-trainable params**: 0
+
+##### Arquitetura da CNN
+
+| Layer (type)         | Output Shape             | Param #  |
+|----------------------|--------------------------|----------|
+| Conv2d-1             | [-1, 32, 160, 212]       | 896      |
+| BatchNorm2d-2        | [-1, 32, 160, 212]       | 64       |
+| MaxPool2d-3          | [-1, 32, 80, 106]        | 0        |
+| Conv2d-4             | [-1, 32, 80, 106]        | 9,248    |
+| BatchNorm2d-5        | [-1, 32, 80, 106]        | 64       |
+| MaxPool2d-6          | [-1, 32, 40, 53]         | 0        |
+| Conv2d-7             | [-1, 32, 40, 53]         | 9,248    |
+| BatchNorm2d-8        | [-1, 32, 40, 53]         | 64       |
+| MaxPool2d-9          | [-1, 32, 20, 26]         | 0        |
+| Conv2d-10            | [-1, 32, 20, 26]         | 9,248    |
+| BatchNorm2d-11       | [-1, 32, 20, 26]         | 64       |
+| Conv2d-12            | [-1, 32, 20, 26]         | 25,632   |
+| BatchNorm2d-13       | [-1, 32, 20, 26]         | 64       |
+| MaxPool2d-14         | [-1, 32, 10, 13]         | 0        |
+| Linear-15            | [-1, 128]                | 532,608  |
+| Dropout1d-16         | [-1, 128]                | 0        |
+| Linear-17            | [-1, 64]                 | 8,256    |
+| Dropout1d-18         | [-1, 64]                 | 0        |
+| Linear-19            | [-1, 17]                 | 1,105    |
+
+**Total params**: 596,561
+
+**Trainable params**: 596,561
+
+**Non-trainable params**: 0
 
 
-#### Problemas Encontrados:
 
-- As imagens estavam no formato RGB, mas todo o treinamento foi feito com as imagens em BGR, resultando em inferências com cores distorcidas, deixando as imagens amareladas. É necessário retreinar o modelo corrigindo o dataset para o formato de cor correto.
-- A susceptibilidade ao overfitting foi uma dificuldade encontrada, mesmo após a remoção das imagens duplicadas.
-- Aparentemente, todas as imagens da classe negative foram detectadas como background.
 
-### Segmentação com Shallow U-Net
-
-#### Preparação Do Dataset
+##### Treinamento da Shallow U-net
 
 ###### Divisão em Conjuntos de Treino, Validação e Teste:
-- Se selecionou 60% do dataset original para gerar um dataset de prova.
-- Esse dataset foi dividido em 65% para treino, 15% para validação e 20% para teste.
-- Se escolheu só usar as imágens da esquerda.
+- Se selecionou 75% do dataset original para gerar um dataset reduzido.
+- Se utilizou um seed 42 para fazer todo split (dataset não usado, train-test-val split).
+- Esse dataset reduzido foi dividido em 72% para treino, 10% para validação e 18% para teste.
+- Se escolheu só usar as imagens da esquerda.
 
-#### Treinamento da Shallow U-Net
-
-##### Aumentação dos Dados
-As seguintes transformações são aplicadas aos dados de treinamento usando `transforms.Compose`:
+###### Aumento dos Dados
+As seguintes transformações foram aplicadas aos dados de treinamento usando `transforms.Compose`:
 
 1. **RandomZoomOut**: Aplica um zoom out aleatório na imagem com uma probabilidade de 20%.
-2. **RandomRotation**: Rotaciona a imagem aleatoriamente dentro do intervalo de 0 a 15 graus.
+2. **RandomRotation**: Rotaciona a imagem aleatoriamente dentro do intervalo de 0 a 20 graus.
 3. **RandomHorizontalFlip**: Inverte a imagem horizontalmente com uma probabilidade de 50%.
 4. **GaussianBlur**: Aplica um desfoque gaussiano com um tamanho de kernel de 3x3.
 5. **RandomAdjustSharpness**: Ajusta a nitidez da imagem com um fator de nitidez de 1.25.
+6. **Resize**: Finalmente todas as imagens foram reajustadas para ter o mesmo tamanho depois das transformações.
 
-##### Características de Treinamento
+###### Hiperparâmetros
 
 - Batch size: 32
-- Tamanho das imágens: (162,212,3)
+- Tamanho das imagens: (162,212,3)
 - Número de classes: 2
-- Profundidade: 3
-- Filtros inicíais: 16
+- Profundidade da Unet: 3
+- Filtros inicíais: 32
 - Modo: Concatenação
-- Épocas: 100
-- Learning rate: 0.0001
+- Épocas: 188
+- Learning rate: 0.00005
 
-#### Desempenho do Algoritmo
+##### Treinamento do modelo integrado SUN-CNN
 
-A continuação se apresenta as curvas de perdas nos conjuntos de treinamento e validação.
+###### Divisão em Conjuntos de Treino, Validação e Teste:
+- Se utilizou todo o dataset.
+- Se utilizou um seed 42 para fazer todos os splits (train-test-val split).
+- Esse dataset foi dividido em 76.5% para treino, 10% para validação e 13.5% para teste.
+- Se escolheu só usar as imagens da esquerda.
 
-![Curva-perda](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/curva_perda.png)
+###### Aumento dos Dados
+As seguintes transformações foram aplicadas aos dados de treinamento usando `transforms.Compose`:
 
-No caso das métricas de avaliação por segmentação:
-- Pixel Accuracy: 72.69 %
-- IoU: 0.9
+1. **RandomZoomOut**: Aplica um zoom out aleatório na imagem com uma probabilidade de 20%.
+2. **RandomRotation**: Rotaciona a imagem aleatoriamente dentro do intervalo de 0 a 20 graus.
+3. **RandomHorizontalFlip**: Inverte a imagem horizontalmente com uma probabilidade de 50%.
+4. **GaussianBlur**: Aplica um desfoque gaussiano com um tamanho de kernel de 3x3.
+5. **RandomAdjustSharpness**: Ajusta a nitidez da imagem com um fator de nitidez de 1.25.
+6. **Resize**: Finalmente todas as imagens foram reajustadas para ter o mesmo tamanho depois das transformações.
+
+###### Hiperparâmetros de treinamento
+
+- Batch size: 32
+- Tamanho das imagens: (162,212,3)
+- Número de classes: 17
+- Épocas: 150
+- Learning rate inícial: 0.0005
+- Learning rate decay: 0.98, cada 5 épocas
+
+#### Resultados
+
+##### Curvas de perdas e precisão
+
+Como o treinamento da rede Shallow U-net + CNN teve duas etapas, se obtiveram duas curvas de perdas
+
+![Curva de Perda UNet](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/curva_perda_unet.png)
+
+![Curves Classification Gestures](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/curves_classification_gestures.png)
+
+##### Matriz de confusão
+
+![Confusion Matrix](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/conf_matrix.png)
+
+##### Relátorio de classificação
+
+![Classification Report](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/classification_report.png)
+
+##### Métricas de segmentação
+
+- Intersection over Union (IoU): 0.90
+- Pixel accuracy: 0.82
 
 <details>
-<summary title="Click to Expand/Collapse">Exemplos de gestos</summary>
+<summary title="Click to Expand/Collapse">Exemplos de gestos segmentados</summary>
 
-![Example Results](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_20.png)
-
-![Example Results](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_80.png)
-
-![Example Results](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_120.png)
-
-![Example Results](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_1498.png)
-
-![Example Results](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_1378.png)
-
+| Comando            | Exemplo                                                        | Comando            | Exemplo                                                        |
+|--------------------|-----------------------------------------------------------------|--------------------|----------------------------------------------------------------|
+| Start_comm         | ![Image 1](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class1.png) | End_comm           | ![Image 2](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class2.png) |
+| Up                 | ![Image 3](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class3.png) | Down               | ![Image 4](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class4.png) |
+| Photo              | ![Image 5](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class5.png) | Backwards          | ![Image 6](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class6.png) |
+| Carry              | ![Image 7](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class7.png) | Boat               | ![Image 8](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class8.png) |
+| Here               | ![Image 9](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class9.png) | Mosaicc      | ![Image 10](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class10.png) |
+| Num_delimiter                | ![Image 11](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class11.png) | One                | ![Image 12](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class12.png) |
+| Two              | ![Image 13](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class13.png) | Three               | ![Image 14](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class14.png) |
+| Four               | ![Image 15](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class15.png) | Five           | ![Image 16](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class16.png) |
+| Negative | ![Image 17](https://raw.githubusercontent.com/RTrombini/IA904-2024S1/main/projetos/sinais_mergulhadores/assets/exampleResults_class0.png)   |  | |
 </details>
 
-#### Problemas encontrados 
+##### Métricas de classificação
 
-- A Shallow U-net aprendeu a reconhecer as luvas, mas isso gera falsos positivos.
-- Overfitting aparece pois o conjunto de dados de treinamento foi relativamente pequeno.
-- É necessário fazer um post-processamento das máscaras para filtrar características não desejáveis.
-- Seria necessário treinar uma rede mais para classificar os gestos.
-- 100 épocas não foi suficiente para que a rede complete seu aprendizado.
+- Precisão: 0.95
+- Sensibilidade: 0.91
+- F1 score: 0.92 
+- Cohen Kappa score: 0.94
+- Matthews Correlation Coefficient: 0.94
 
-## Próximos passos
+##### Número de parâmetros treináveis
 
-### Correção do Formato de Cores
+- Shallow U-net: 466,562
+- CNN: 596,561
+- Total: 1,063,123
 
-**Ação:** Retreinar o modelo utilizando imagens no formato de cor correto (RGB).  
-**Objetivo:** Garantir que o modelo opere corretamente no espectro de cores adequado, eliminando a distorção amarelada observada nas inferências.
-**Estimativa de tempo**: < 1 semana
+## Discussão
 
-### Aprimoramento do Dataset
+A motivação central deste projeto é desenvolver um sistema eficaz para identificar e interpretar sinais de mão de mergulhadores, com o objetivo de melhorar a comunicação subaquática e a segurança durante mergulhos. Este sistema se inspira no projeto CADDY, que visa entender o comportamento dos mergulhadores através da interpretação de gestos manuais simbólicos e indicadores não verbais. Para atingir este objetivo, foram exploradas duas abordagens principais: a detecção e classificação de gestos utilizando a YOLOv8 e a combinação de segmentação com a Shallow U-Net seguida por uma classificação com uma CNN.
 
-**Ação:** Aplicar técnicas de pré-processamento nas imagens para melhorar a qualidade visual, como ajuste de contraste e remoção de ruído.  
-**Objetivo:** Aumentar a precisão do modelo em condições subaquáticas adversas.
-**Estimativa de tempo**: 1 semana
+O treinamento do modelo YOLOv8 nano envolveu a preparação do dataset, incluindo a conversão das coordenadas de ROI para o formato YOLO. Utilizamos 100 épocas com imagens de 640x640 pixels. Os resultados obtidos foram:
 
-### Revisão e Balanceamento do Dataset
+- **Precisão (Precision)**: 0.913
+- **Revocação (Recall)**: 0.928
+- **mAP50 (Mean Average Precision at IoU=0.50)**: 0.932
+- **mAP50-95 (Mean Average Precision at IoU=0.50:0.95)**: 0.693
 
-**Ação:** Revisar o dataset para garantir que todas as classes estejam bem representadas e balanceadas.  
-**Objetivo:** Evitar problemas de overfitting e underfitting, proporcionando um treinamento mais robusto.
-**Estimativa de tempo**: 1 semana
+Por outro lado, a abordagem utilizando a Shallow U-Net para segmentação seguida por uma CNN para classificação apresentou resultados competitivos. Com um menor número de parâmetros, essa abordagem demonstrou ser menos custosa computacionalmente e ainda assim eficaz para a tarefa de detecção de gestos subaquáticos.
 
-### Ajustes Finais no Modelo
+Os resultados indicam que ambos os métodos são viáveis para a detecção e classificação de gestos subaquáticos. No entanto, ao comparar os dois métodos, observamos que os resultados foram muito próximos. Dado que o método Shallow U-Net + CNN possui um menor custo computacional e um número significativamente menor de parâmetros, ele se mostra mais performático e relevante para aplicações práticas.
 
-**Ação:** Experimentar com diferentes hiperparâmetros, como taxa de aprendizado, tamanho do lote e número de épocas.  
-**Objetivo:** Otimizar o desempenho do modelo YOLOv8 para a tarefa específica de detecção de gestos subaquáticos.
-**Estimativa de tempo**: 1.5 - 2 semanas
+Em termos de métricas, tanto a precisão quanto o recall são cruciais. A precisão é importante para minimizar falsos positivos, enquanto o recall é essencial para garantir que os gestos sejam detectados sempre que presentes. No contexto de segurança subaquática, um alto recall pode ser ligeiramente mais crítico, pois garantir que todos os gestos sejam detectados pode prevenir acidentes e melhorar a comunicação.
 
-### Análise da Classe Mosaic
+Comparando os dois métodos, o método Shallow U-Net + CNN, devido ao seu menor custo computacional e alta performance, parece ser mais adequado para futuras aplicações. Este método não só alcança resultados comparáveis aos da YOLOv8, mas também é mais eficiente, tornando-se uma escolha preferível para a implementação em sistemas de comunicação subaquática.
 
-**Ação:** Verificar se a ausência de detecções da classe mosaic no dataset de teste foi coincidência ou um problema do modelo.  
-**Objetivo:** Se necessário, ajustar o modelo e garantir a inclusão adequada de amostras da classe mosaic no dataset de treino e teste.
-**Estimativa de tempo**: 1 semana
+Esta análise destaca a importância de considerar não apenas a performance bruta, mas também a eficiência e a aplicabilidade prática ao escolher e desenvolver modelos de Machine Learning para detecção de gestos subaquáticos.
 
-### Separação entre Negative e Background
 
-**Ação:** Analisar se é mais vantajoso detectar a classe negative como background ou mantê-la como uma classe separada e ajustar o modelo conforme necessário.  
-**Objetivo:** Melhorar a precisão da detecção e a utilidade prática do modelo em cenários reais, decidindo a abordagem mais eficaz.
-**Estimativa de tempo**: < 1 semana
+## Conclusão
 
-### Treinar uma rede com as imágens das luvas segmentadas
+O desenvolvimento deste projeto nos permitiu alcançar dois sistemas eficazes para a detecção e classificação de gestos de mão de mergulhadores. Utilizando duas abordagens distintas – YOLOv8 e Shallow U-Net seguida de CNN – conseguimos validar a viabilidade de ambas as técnicas, cada uma com seus pontos fortes específicos.
 
-**Ação:** Usar uma rede menor para reconhecer os gestos realizados pelos mergulhadores.
-**Objetivo:** Tentar ter um workflow com duas redes que possa diminuir o número de parâmetros treináveis.
-**Estimativa de tempo**: 1 semana
+### Principais Conclusões
 
-### Melhorar o desempenho da Shallow U-net
+1. **Viabilidade de Modelos de Detecção e Classificação**: Tanto o YOLOv8 quanto a combinação de Shallow U-Net com CNN demonstraram ser eficazes na tarefa de detecção de gestos subaquáticos. Cada abordagem apresentou alta precisão e recall, com resultados muito próximos.
 
-**Ação:** Trocar os hiperparâmetros do treinamento da rede, aumentar a sua profundidade e o número de filtros.
-**Objetivo:** Incrementar o desempenho para reduzir o número de falsos positivos e melhorar a qualidade das máscaras geradas.
-**Estimativa de tempo**: 1 semana
+2. **Eficiência Computacional**: O método Shallow U-Net + CNN, devido ao seu menor número de parâmetros e custo computacional reduzido, mostrou-se mais eficiente, tornando-se uma alternativa preferível para aplicações práticas onde recursos computacionais são limitados.
+
+3. **Importância das Métricas de Avaliação**: A precisão e o recall se mostraram métricas essenciais para avaliar a performance dos modelos, garantindo que os gestos sejam corretamente detectados e minimizando falsos positivos e negativos.
+
+### Principais Desafios
+
+1. **Preparação e Conversão do Dataset**: Converter o dataset para um formato compatível com os modelos de detecção foi um desafio significativo, além da necessidade de balancear as classes de gestos para evitar vieses nos resultados.
+
+2. **Pré-processamento das Imagens**: Lidar com as variáveis condições subaquáticas durante o pré-processamento das imagens foi crítico para melhorar a performance dos modelos.
+
+### Lições Aprendidas
+
+1. **Importância da Reprodutibilidade**: Garantir que nossos métodos e resultados sejam reprodutíveis é crucial para a validade científica. A criação de pipelines claros e detalhados, juntamente com a documentação rigorosa dos passos, permite que outros pesquisadores possam replicar e validar nossos achados.
+
+2. **Uso de Métricas Adequadas**: Selecionar as métricas corretas para avaliar a performance dos modelos é fundamental. Precisão, recall, mAP e outras métricas foram essenciais para compreender a eficácia dos modelos desenvolvidos.
+
+3. **Comparação entre Abordagens**: Comparar diferentes abordagens de visão computacional nos permitiu identificar não apenas qual modelo performa melhor, mas também qual é mais eficiente e prático para implementações reais. Esse entendimento é vital para a aplicação de soluções em ambientes operacionais.
+
+4. **Adaptação a Condições Variáveis**: O pré-processamento das imagens e a adaptação dos modelos para lidar com as variáveis condições subaquáticas foram desafios que nos ensinaram a importância da flexibilidade e robustez nos métodos de visão computacional.
+
+
+Este projeto não apenas avançou na área de detecção de gestos subaquáticos, mas também solidificou nosso entendimento sobre a importância da reprodutibilidade, avaliação de métricas e comparação entre diferentes abordagens em projetos de visão computacional.
+
+
+## Trabalhos futuros
+
+Com mais tempo e recursos, há várias áreas que poderiam ser exploradas e melhoradas para fortalecer ainda mais os resultados obtidos neste projeto.
+
+### Ajuste Fino de Hiperparâmetros
+
+1. **Exploração de Hiperparâmetros**: Realizar uma busca mais aprofundada por hiperparâmetros poderia otimizar ainda mais o desempenho dos modelos. Isso inclui ajustar taxas de aprendizado, tamanhos de batch e parâmetros específicos dos modelos YOLOv8 e Shallow U-Net.
+
+2. **Validação Cruzada**: Implementar técnicas de validação cruzada para garantir que o modelo generalize bem em diferentes subconjuntos dos dados.
+
+### Testes em um Sistema em Tempo Real
+
+1. **Implementação em Tempo Real**: Implementar e testar os modelos em um sistema de comunicação subaquática em tempo real para validar sua eficácia operacional e identificar possíveis melhorias.
+
+2. **Desenvolvimento de Interface**: Criar uma interface de usuário amigável que permita aos mergulhadores e operadores interagir com o sistema de reconhecimento de gestos de maneira intuitiva.
+
+### Exploração de Modelos Alternativos
+
+1. **Arquiteturas de Modelos Diferentes**: Explorar outras arquiteturas de modelos de deep learning, como Transformers, que têm se mostrado promissoras em várias tarefas de visão computacional.
+
+2. **Modelos Híbridos**: Investigar combinações de diferentes tipos de modelos (e.g., combinação de CNNs com RNNs para considerar a sequência temporal dos gestos).
+
+3. **Modelos YOLO Maiores**: Considerando que utilizamos apenas a YOLOv8n (nano), seria interessante explorar como os modelos maiores da mesma família (YOLOv8s, YOLOv8m, YOLOv8x) poderiam melhorar a performance.
+
+### Pré-processamento Avançado de Imagens
+
+1. **Filtros e Técnicas de Realce de Imagem**: Desenvolver e aplicar técnicas mais avançadas de pré-processamento de imagens para melhorar a qualidade das imagens subaquáticas, como filtros adaptativos e métodos de realce de contraste.
+
+2. **Redução de Ruído**: Implementar algoritmos mais sofisticados para a redução de ruído nas imagens, o que poderia melhorar a precisão da detecção e classificação dos gestos.
+
+Ao abordar essas áreas, poderíamos não apenas melhorar o desempenho dos modelos desenvolvidos, mas também garantir sua aplicabilidade prática em uma variedade maior de condições e cenários, contribuindo para a comunicação subaquática de maneira mais eficiente e segura.
+
 
 ## Referências
+
 - Gomez Chavez, A.; Ranieri, A.; Chiarella, D.; et al. CADDY Underwater Stereo-Vision Dataset for Human–Robot Interaction (HRI) in the Context of Diver Activities. J. Mar. Sci. Eng. 2019, 7, 16.
 - Chiarella, D. Towards Multi-AUV Collaboration and Coordination: A Gesture-Based Multi-AUV Hierarchical Language and a Language Framework Comparison System. J. Mar. Sci. Eng. 2023, 11, 1208.
+- Ultralytics. YOLOv8 Documentation. Available at: [https://docs.ultralytics.com/](https://docs.ultralytics.com/)
+- Goodfellow, I., Bengio, Y., & Courville, A. (2016). Deep Learning. MIT Press.
+- Kingma, D. P., & Ba, J. (2015). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
+- He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770-778).
+- Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollar, P. (2020). Focal Loss for Dense Object Detection. IEEE Transactions on Pattern Analysis and Machine Intelligence, 42(2), 318-327.
+- Paszke, A., et al. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. In Advances in Neural Information Processing Systems (NeurIPS).
+- Redmon, J., & Farhadi, A. (2018). YOLOv3: An incremental improvement. arXiv preprint arXiv:1804.02767.
+- Ronneberger, O., Fischer, P., & Brox, T. (2015). U-Net: Convolutional Networks for Biomedical Image Segmentation. In International Conference on Medical image computing and computer-assisted intervention (pp. 234-241). Springer, Cham.
+- Metrics Reloaded. Platform for selecting and evaluating performance metrics for machine learning models. Available at: [https://metrics-reloaded.io/](https://metrics-reloaded.io/)
+- Simonyan, K., & Zisserman, A. (2014). Very Deep Convolutional Networks for Large-Scale Image Recognition. arXiv preprint arXiv:1409.1556.
+
