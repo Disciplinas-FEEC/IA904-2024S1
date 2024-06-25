@@ -359,7 +359,7 @@ Seguem as tabelas com os resultados das métricas:
 | Male   | Black            | 0.656324              |
 |        | White            | 0.676139              |
 
-Ao final, foi possível observar que em nenhum dos três modelos foi visto viés em relação a raça negra.
+Ao final, foi possível observar que em nenhum dos três modelos foi visto viés em relação a raça negra. Com exceção do modelo Blaze Face, em que é possível encontrar uma diferença nas métricas da raça negra, principalmente em igualdade de tratamento. 
 
 ## Discussão
 Os resultados deste estudo fornecem resultados satisfatórios. A hipótese era que havia viés em modelos modernos de detecção de rostos, especificamente dificultando a detecção de rostos negros. No entanto, os modelos estudados não mostraram tal viés, o que sugere que essas tecnologias podem estar se tornando mais justas em relação a diferentes etnias.
