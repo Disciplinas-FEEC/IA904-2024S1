@@ -181,7 +181,7 @@ onde os keypoints para gerar o sample do dataset, ou seja, o target do modelo, �
 
 Infelizmente, poucas conclusões podem ser obtidas dos treinos e modelos em si.
 
-Entre aprendizados, conseguimos colocar em prática conceitos de reprodutibilidade como worflow e publicação de elementos utilizados (datasets e dados intermediários), assim como o datasheet. Entre ferramentas, pudemos aprender mais sobre o uso do "Weights and Biases", "Zenodo" e "MMPose". Ao construir e treinar o modelo, aprendemos sobre a construção de uma CNN com conexão residual, e a lidar com a paralelização da leitura dos dados no dataset.
+Um dos principais aprendizados que tivemos neste projeto é que é muito fácil criar hipóteses sobre o comportamento de algo que não condizem de fato com o fenômeno, o que aconteceu ao realizarmos os ajustes dos hiperparâmetros e análises dos diferentes modelos, sem perceber inicialmente que não estavam treinando corretamente. Outros aprendizados incluem conseguirmos colocar em prática conceitos de reprodutibilidade como worflow e publicação de elementos utilizados (datasets e dados intermediários), assim como o datasheet. Entre ferramentas, pudemos aprender mais sobre o uso do "Weights and Biases", "Zenodo" e "MMPose". Ao construir e treinar o modelo, aprendemos sobre a construção de uma CNN com conexão residual, e a lidar com a paralelização da leitura dos dados no dataset.
 
 As dificuldades principais são relacionadas ao cronograma do projeto, que se mostrou de difícil execução durante o tempo proposto. Limitações de hardware também geraram problemas durante o treinamento do modelo.
 
