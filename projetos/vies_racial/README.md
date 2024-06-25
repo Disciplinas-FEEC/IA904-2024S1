@@ -25,11 +25,18 @@ Realizamos, também, uma análise na literatura de métricas de viés, como pari
 Para a análise dessas métricas, selecionamos alguns modelos populares de detecção facial (MTNCC, Blaze Face e Retina Face), utilizando o dataset mencionado na seção de dataset. O MTNCC (Multi-Task Cascaded Convolutional Networks) é conhecido por sua eficácia em detecção facial multitarefa. Blaze Face é um modelo leve e rápido, frequentemente usado em aplicações móveis, enquanto Retina Face é aclamado por sua precisão em reconhecimento facial robusto. Esses modelos serão avaliados para identificar disparidades de desempenho entre diferentes grupos étnicos, proporcionando uma visão abrangente das limitações e potencialidades dos modelos em termos de equidade racial.
 
 ## Metodologia
-Nesta seção, será delineada a metodologia adotada para investigar o viés na distribuição dos embeddings das redes de imagens em relação à raça, utilizando técnicas de redução de dimensionalidade como t-Distributed Stochastic Neighbor Embedding (t-SNE) ou Uniform Manifold Approximation and Projection (UMAP). 
+Nesta seção, será delineada a metodologia adotada para investigar o viés na distribuição dos embeddings das redes de imagens em relação à raça, utilizando técnicas de redução de dimensionalidade como t-Distributed Stochastic Neighbor Embedding (t-SNE) ou Uniform Manifold Approximation and Projection (UMAP). Além disso iremos delinear como será feito o treinamento e análise de viés no modelo de XGBoost que tentará prever o sexo da pessoa dado o embedding da face e como iremos fazer o comparativo dos modelos mais famosos de detecção facial (MTNCC, Blaze Face e Retina Face).
 
 No que diz respeito ao pré-processamento, prevemos realizar poucas ou nenhuma modificação nos dados, uma vez que nosso objetivo é analisar o comportamento dos modelos e identificar quais hiperparâmetros precisam ser ajustados para mitigar o viés racial em cada um deles. Também planejamos aumentar o conjunto de dados utilizando diversas técnicas de aumento de dados, garantindo o equilíbrio das etnias representadas no conjunto. 
 
-Esse enfoque permitirá a avaliação dos melhores modelos e ajustes de hiperparâmetros que possam mitigar o viés racial nos modelos. Por fim, pretendemos aplicar técnicas de interpretabilidade, como atribuição de saliência e mapas de ativação, para compreender quais características da imagem os modelos estão priorizando em suas decisões.
+Esse enfoque permitirá a avaliação dos melhores modelos e metrificação do viés por métodos já utilizados na literatura.
+
+As métricas utilizadas serão:
+- Paridade Demográfica 
+- Igualdade de Oportunidade
+- Igualdade de Chance
+- Paridade Preditiva
+- Igualdade de Tratamento 
 
 ## Bases de Dados e Evolução
 A base de dados que será utilizada será a [FairFace](https://github.com/joojs/fairface). Um conjunto de dados de atributos faciais para raças, gêneros e idades equilibrados. Durante este projeto, só serão utilizados os rótulos de raça. [1] Serão apresentados três exemplos de imagens presentes entre os dados e os respectivos rótulos:
@@ -78,29 +85,42 @@ Serão apresentadas a seguir as ferramentas e bibliotecas a serem utilizadas dur
 Biblioteca principal:
 - PyTorch
 
-Data-augmentation:
-- Random Rotation
-- Random Horizontal Flip
-- Random Vertical Flip
-- Random Resized Crop
-
 Modelos utilizados para geração dos embeddings:
 - FaceNet
-- VGGFace
+- BlazeFace
+- MTNCC
+- Retina Face
 
 Redução de dimensionalidade:
 - t-Distributed Stochastic Neighbor Embedding (t-SNE) 
 - Uniform Manifold Approximation and Projection (UMAP)
 
 Avaliação de modelos:
-- Weights & Biases
+- Paridade Demográfica 
+- Igualdade de Oportunidade
+- Igualdade de Chance
+- Paridade Preditiva
+- Igualdade de Tratamento 
 
 Cálculo de métricas:
-- TorchEval
+- Fairlearn
 
-Explicabilidade:
-- Grad-cam
-- Saliency Vanilla_gradient
+Ambiente computacional:
+- Visual Studio Code
+- Python 3.12
+
+## Workflow
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <div style="text-align: center;">
+    <img src="assets/blaze.png" alt="Imagem 4" width="30%" />
+    <p>Workflow para os modelos <br>pré-treinados<br></p>
+  </div>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <div style="text-align: center;">
+    <img src="assets/xgboost.png" alt="Imagem 5" width="30%" />
+    <p>Workflow para XGBoost</p>
+  </div>
 
 ## Principais desafios
 Durante o desenvolvimento do projeto, antecipamos a presença de desafios significativos relacionados a questões éticas. Conscientes da diversidade de perspectivas e debates valiosos, reconhecemos a necessidade de um estudo cuidadoso. O reconhecimento facial, tarefa que sucede a detecção facial, objeto de estudo nesta pesquisa, frequentemente é encarado como uma prática intrusiva que pode expor indivíduos pertencentes a minorias em certos contextos nacionais. Esses grupos correm o risco de serem erroneamente identificados ou percebidos como ameaças à segurança por modelos de reconhecimento facial. No entanto, a compreensão das injustiças e preconceitos presentes nessas situações é uma empreitada complexa. Além disso, enfrentaremos o desafio de compreender o conceito de etnia, especialmente em uma sociedade tão diversa e miscigenada como a nossa.
