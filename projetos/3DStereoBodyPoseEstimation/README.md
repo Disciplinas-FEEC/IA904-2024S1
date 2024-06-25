@@ -62,6 +62,8 @@ Scenario4|Fixed-Test|Teste|Parâmetros da câmera fixos
 
 Uma descrição mais detalhada do protocolo de geração pode ser obtido em [OAK-D Synthetic Pose Dataset Generation Protocol](https://github.com/EltonCN/IA904-2024S1/blob/7b13886703576c74ecca8f1b1dd751d36a8c1896/projetos/3DStereoBodyPoseEstimation/data/OAK-D%20Synthetic%20Pose%20Dataset%20Generation%20Protocol.pdf).
 
+O código do gerador de dados pode está disponível no repositório [IA904-3D_Pose](https://github.com/EltonCN/IA904-3D_Pose).
+
 Para o uso durante treino, o dataset é divido em 3 conjuntos:
 
 Conjunto de treino | Conjuntos do dataset pertencentes
