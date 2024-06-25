@@ -22,6 +22,10 @@ O projeto consiste em analisar o biospeckle de um tomate para estimarmos o seu e
     <figcaption>"(a) Assembly diagram for biospeckle capture of tomato using 633 nm and543 nm lasers. The beam is parallel to the table and with an incident angle of 19.5º. The angle of specular reflection was defined as θ = 0º. Negative angles are between the specular reflection and the incident beam (-19.5º, -13º, and -6.5º), while positive angles of theta are beyond the reflected specular reflection (6.5º and 13º). (b) Photo of the central part of the setup showing a representation of the laser beam, biological sample, and webcam."(J. F. Serighelli, E. Fujiwara and C. M. B. Cordeiro, 2023, pp. 1-2)</figcaption>
 </figure>
 
+É de interesse para a pesquisa, a classificação de maturação de tomates de maneira automatizada evita uso de técnicas analíticas e estatísticas, otimizando tempo de ensaios laboratoriais e análise de dados.
+
+Na área de alimentos, a classificação de maturação garante o controle de qualidade dos frutos usados na produção industrial (usar tomates na maturação certa).
+
 ## Metodologia
 A principal metodologia a ser seguida será com base em [[3]](#3), no qual foi realizado o treinamento de uma rede neural para classificação de speckles de diferentes comprimentos de onda com o objetivo de verificar a eficácia do uso de deep learning para identificação de padrões em medição via speckle.
 
@@ -29,451 +33,365 @@ O artigo conclui que o uso de redes neurais são ideais para estas análises poi
 
 Na publicação [[1]](#1) o uso de Biospeckle se mostrou um novo método eficaz de avaliação de frutos pois não é destrutivo e é mais preciso sendo menos sujeito a uma mera análise por cor por ser capaz de quantificar a atividade biológica do fruto.
 
-Dito isso, podemos então reaproveitar a metodologia utilizada nos artigos anteriores desta vez ao invés de classificar comprimentos de onda, iremos classificar o dia de maturação de um tomate do momento da sua colheita até trigésimo dia de maturação utilizando o biospeckle do tomate e seus respectivos dias de maturação e uma rede neural treinada por deep learning para identificar os padrões correspondentes ao dia de maturação.
+Dito isso, podemos então reaproveitar a metodologia utilizada nos artigos anteriores desta vez ao invés de classificar comprimentos de onda, iremos classificar o dia de maturação de um tomate do momento da sua colheita até trigésimo dia de maturação utilizando o biospeckle do tomate e seus respectivos dias de maturação e uma rede neural treinada por deep learning para identificar os padrões correspondentes ao dia de maturação. Em relação ao dis de maturação, será feito testes com dois método de rotular o dataset:
+
+Método 1:
+ * 6 períodos: dia 0 a 1/ dia 2 a 3/ dia 4 a 5/ dia 7 a 9/ dia 11 a 17/ dia 24 a 31
+
+Método 2:
+ * 3 classes: verde(dia 0 a 3), maduro(dia 4 a 9) e senescente(dia 11 a 31)
 
 Os modelos utilizados serão:
- * Modelo base de 3 camadas convolucionais para comparação.
- * Modelo proposto no artigo Deep Learning Enabled Laser Speckle Wavemeter with a High Dynamic Range.
- * Modelo classico de CNN, VGG16
-
-Além disso, com base na publicação [[4]](#4) os modelos de CNNs mais tradicionais pecam em identificar texturas, portanto também será utilizado o modelo:
- * FENet
+ * Modelo baseado no VGG16, com menos layers de convolução e downsize no tamanho das camadas FC
 
 Assim como no artigo de R. K. Gupta, iremos avaliar os modelos com base na acurácia, F1-score e pela sua matriz de confusão.
-## Bases de Dados e Evolução
+
+## Bases de Dados
 
 
 Base de Dados | Datasheet |  Resumo descritivo
 ----- | ----- | -----
 Dataset pessoal de Juan |  [Estrutura do dataset](./data/tomate_dataset.csv)<br /> [Estrutura do subset](./data/small_tomate_dataset.csv) | Acervo pessoal de iniciação científica realizada em 2023, acervo composto de vídeos que serão extraídos os frames em formato jpg de tamanho 480x640.
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/biospeckle-green.png"
-            alt="green, biospeckle">
-        <figcaption>Biospeckle com laser verde </figcaption>
-    </figure>
-</div>
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/biospeckle-red.png"
-            alt="red, biospeckle">
-        <figcaption>Biospeckle com laser vermelho </figcaption>
-    </figure>
-</div>
+<figure>
+    <img src="assets/images/biospeckle-green.png"
+        alt="green, biospeckle">
+    <figcaption>Biospeckle com laser verde </figcaption>
+</figure>
 
-## Ferramentas
-As principais ferramentas para este projeto serão:
+
+
+<figure>
+    <img src="assets/images/biospeckle-red.png"
+        alt="red, biospeckle">
+    <figcaption>Biospeckle com laser vermelho </figcaption>
+</figure>
+
+
+## Ambiente computacional
+As principais ferramentas utilizadas neste projeto:
+ * Google Drive
  * PyTorch
  * Google Colab
  * scikit-learn
- * [alexlenail](http://alexlenail.me/NN-SVG/AlexNet.html)
- * draw.io
 
-## Principais desafios
-
-O principal desafio do projeto está relacionado ao tempo disponível para escolher os melhores parâmetros para se utilizar no treinamento, como por pré-processamento dos dados, utilizar rgb ou grayscale e/ou data augmentation. Além disso se mostrou importante manusear os dados de forma correta para que não ocorra modificações no dataset de forma indevida. 
-## Cronograma
-Semana | Data | Objetivo
------ | ----- | -----
-0 | 30/04 à 05/05 | Proposta de projeto e grupo
-1 | 07/05 à 13/05 | Planejamento detalhado do projeto
-2 | 14/05 à 20/05 | Criação do modelo base e testes iniciais
-3 | 21/05 à 27/05 | Experimentação com outros modelos e data augmentation
-4 | 28/05 à 03/06 | Preparação para entrega de resultados preliminares
-5 | 04/06 à 10/06 | Escolha de melhor modelo e testes de desempenho
-6 | 11/06 à 17/06 | Escolha de melhor modelo e testes de desempenho
-7 | 18/06 à 25/05 | Preparação das conclusões finais e entrega de projeto[4]
+Todos os testes foram feitos pelo ambiente de desenvolvimento da Google, utilizando-se da plataforma do Google Drive para manusear o Dataset e de scripts no Google Colab para extração de frames e rotulação dos dados.
 
 ## Workflow
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/workflow/workflow.drawio.png"
-            alt="workflow">
-        <figcaption>Fluxograma </figcaption>
-    </figure>
-</div>
+<figure>
+    <img src="assets/workflow/workflow.png"
+        alt="workflow">
+    <figcaption>Fluxograma </figcaption>
+</figure>
 
-## Experimentos e Resultados preliminares
+## Avaliação
 
-Antes de iniciar o experimento, foi definido um modelo inicial de 3 camadas convolucionais, com kernel de tamanho 7x7. Este será o modelo base em todos os experimentos.
+No problema da classificação dos tomates dado o contexto de controle de qualidade na produção industrial de alimentos, é de grande interesse identificar corretemente os estágios de maturação do tomate e evitar falsos negativos e falsos positivos visando a qualidade correta da produção.
+
+Portanto, as métricas a serem escolhidas devem ser relevantes ao contexto citado acima, desta forma decide-se por: Recall, precision e F1-score pois são métricas que avaliam os principais pontos, de falso positivo e falso negativo.
+
+Além disso, como é bem provável que os períodos de classificaçao se sobreponham entre si, o uso de matriz de confusão permite a identificação de períodos que possam estar na intersecção entre uma classe e outra.
+
+## Experimentos e Resultados
+
+Foram feitos x experimentos, utilizando dois métodos de rótular o dataset e dois modelos de CNN
+
+### Model V1:
 
 ```
 ----------------------------------------------------------------
         Layer (type)               Output Shape         Param #
 ================================================================
-            Conv2d-1         [-1, 32, 239, 319]           4,704
-         MaxPool2d-2         [-1, 32, 120, 160]               0
-            Conv2d-3           [-1, 64, 59, 79]         100,352
-         MaxPool2d-4           [-1, 64, 30, 40]               0
-            Conv2d-5          [-1, 128, 14, 19]         401,408
-         MaxPool2d-6           [-1, 128, 7, 10]               0
-            Linear-7                  [-1, 120]       1,075,320
-            Linear-8                   [-1, 84]          10,164
-            Linear-9                   [-1, 12]             935
-             Base-10                   [-1, 12]               0
+            Conv2d-1         [-1, 16, 112, 112]             416
+       BatchNorm2d-2         [-1, 16, 112, 112]              32
+              ReLU-3         [-1, 16, 112, 112]               0
+         MaxPool2d-4           [-1, 16, 56, 56]               0
+            Conv2d-5           [-1, 32, 56, 56]           4,640
+       BatchNorm2d-6           [-1, 32, 56, 56]              64
+              ReLU-7           [-1, 32, 56, 56]               0
+         MaxPool2d-8           [-1, 32, 28, 28]               0
+            Conv2d-9           [-1, 64, 28, 28]          18,496
+      BatchNorm2d-10           [-1, 64, 28, 28]             128
+             ReLU-11           [-1, 64, 28, 28]               0
+        MaxPool2d-12           [-1, 64, 14, 14]               0
+          Dropout-13                [-1, 12544]               0
+           Linear-14                 [-1, 4096]      51,384,320
+             ReLU-15                 [-1, 4096]               0
+          Dropout-16                 [-1, 4096]               0
+           Linear-17                 [-1, 4096]      16,781,312
+             ReLU-18                 [-1, 4096]               0
+           Linear-19                    [-1, 6]          24,582
+            Model-20                    [-1, 6]               0
 ================================================================
-Total params: 1,592,883
-Trainable params: 1,592,883
+Total params: 68,213,990
+Trainable params: 68,213,990
+Non-trainable params: 0
+----------------------------------------------------------------
+```
+
+### Model V2:
+
+```
+----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1          [-1, 4, 112, 112]             304
+       BatchNorm2d-2          [-1, 4, 112, 112]               8
+              ReLU-3          [-1, 4, 112, 112]               0
+         MaxPool2d-4            [-1, 4, 56, 56]               0
+            Conv2d-5            [-1, 8, 28, 28]             808
+       BatchNorm2d-6            [-1, 8, 28, 28]              16
+              ReLU-7            [-1, 8, 28, 28]               0
+         MaxPool2d-8            [-1, 8, 14, 14]               0
+            Conv2d-9             [-1, 16, 7, 7]           3,216
+      BatchNorm2d-10             [-1, 16, 7, 7]              32
+             ReLU-11             [-1, 16, 7, 7]               0
+        MaxPool2d-12             [-1, 16, 4, 4]               0
+          Dropout-13                  [-1, 256]               0
+           Linear-14                  [-1, 128]          32,896
+             ReLU-15                  [-1, 128]               0
+          Dropout-16                  [-1, 128]               0
+           Linear-17                   [-1, 64]           8,256
+             ReLU-18                   [-1, 64]               0
+           Linear-19                    [-1, 6]             390
+            Model-20                    [-1, 6]               0
+================================================================
+Total params: 45,926
+Trainable params: 45,926
 Non-trainable params: 0
 ```
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/model.png"
-            alt="workflow">
-        <figcaption>3 Convolutional Layer CNN of Kernel 7x7, Max-Pool of 3x3.
-        First feature extraction of depth 32, subsequent feature extraction of depth 64 and 128. 12 output features</figcaption>
-    </figure>
-</div>
+### Método 1
 
-### Teste inicial
+Neste método foi utilizado o dataset rodulado por períodos a cada 2 dias
 
-O primeiro teste foi feito com o modelo descrito acima, com um **subset** do dataset original, de aproximadamente 13mil imagens com classes desbalanceadas.
- * Não foi feito pré-processamento
- * Divisão dos dados em treinamento, validação e teste. 60/20/20
- * Treinamento raso de 3 épocas e batch size 10
-  
-Resultados obtidos:
+#### Model V1
 
-Resultado com baixa precisão, alta concentração de chutes para o dia 0. Além do dia 0 o modelo só conseguiu diferenciar os dias 11 e 31. Maior f1-score foi no dia 31. Era de se esperar pois os dados nesse dia possuem o maior intervalo de dias de maturação.
+Teste inicial feito com o primerio modelo, neste teste vemos que o modelo conseguiu predizer a classe 0 e 1 sem falhas porém nos casos 3 e 5 o modelo errou 100% e para as classes 2 e 4 teve alto índice de falsos positivos, principalmente na classe 4 que são os dias 11-17 pois houve confusão com o range da classe 3 dos dias 07-09.
 
-```
-                precision    recall  f1-score   support
-		
-            0       1.00      0.23      0.38      1544
-            1       0.00      0.00      0.00         0
-            2       0.08      0.20      0.12       152
-            3       0.00      0.00      0.00         0
-            4       0.00      0.00      0.00         0
-            5       0.00      0.00      0.00         0
-            6       1.00      0.48      0.65       501
-            7       0.00      0.00      0.00         0
-            8       0.51      0.58      0.54       292
-            9       0.00      0.00      0.00         0
-            10       0.61      1.00      0.76       206
+Neste treinamento a acurária estagnou em 67% logos nas primeiras épocas, não tendo aumento dela posteriormente.
 
-    accuracy                           0.37      2695
-    macro avg       0.29      0.23      0.22      2695
-weighted avg       0.87      0.37      0.46      2695
-```
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/tomato_baseline_random_split-epoch=1-val_acc=0.40.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 10 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,24,31]</figcaption>
-    </figure>
-</div>
+Resultados:
 
-Erros cometidos:
-
- * Treino muito raso
-
- * Não houve verificação do dataset para o teste inicial, o subset do dataset completo ocorreu de forma inesperada pois faltou a inclusão do restante dos dados. Isso acarretou em desbalanceamento de classes de forma não intencional.
-Este erro será carregado para os próximos testes.
-
- * A divisão dos dados foi feito de forma aleatória o que pode ter introduzido ainda mais desbalanceamento de classes. Além disso o subset foi dividido entre treinamento, validação e teste. 
-Porém na análise de resultados, as funções utilizadas dividiam novamente o subset o que pode criar um conjunto de teste que contém dados utilizados no treinamento.
-
- * Erros de identificação dos dias na matriz de confusão.
-
-### Teste com estratificação na divisão do dataset
-
-Para resolver o problema do desbalanço de classes na divisão do dataset, foi utilizado a função do scikit-learn train_test_split com stratify habilitado com:
- * Não foi feito pré-processamento
- * Divisão dos dados em treinamento, validação e teste. 60/20/20
- * Treinamento raso de 3 épocas e batch size 10
-  
-Resultados obtidos:
-
-Comparado ao experimento anterior, houve uma pequena melhoria com a perda da habilidade de reconhecer o dia 2 mas com mais precisão para reconhecer o dia 24 porém os problemas anteriormente mencionados se mantiveram nesse teste.
+<figure>
+    <img src="assets/images/model2/model_v1_metodo1_test_dataset.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V1 pelo método 1</figcaption>
+</figure>
 
 ```
               precision    recall  f1-score   support
 
-           0       1.00      0.24      0.38      1508
-           1       0.00      0.00      0.00         0
-           2       0.00      0.00      0.00         0
-           3       0.00      0.00      0.00         0
-           4       0.00      0.00      0.00         0
-           5       0.00      0.00      0.00         0
-           6       0.98      0.87      0.92       272
-           7       0.00      0.00      0.00         0
-           8       0.53      0.73      0.62       241
-           9       0.48      0.30      0.37       361
-          10       0.65      0.71      0.68       313
+           0       1.00      1.00      1.00        42
+           1       1.00      1.00      1.00        42
+           2       0.71      1.00      0.83        42
+           3       0.00      0.00      0.00        42
+           4       0.39      1.00      0.56        42
+           5       0.00      0.00      0.00        42
 
-    accuracy                           0.41      2695
-   macro avg       0.33      0.26      0.27      2695
-weighted avg       0.85      0.41      0.49      2695
+    accuracy                           0.67       252
 ```
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/tomato_baseline-epoch=1-val_acc=0.40.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 10 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,24,31]</figcaption>
-    </figure>
-</div>
+#### Model V2
 
-Erros cometidos:
+Para solucionar o problema de estagnação durante o treinamento, foi reduzido o tamanho das camadas. Porém o resultado obtido foi de um modelo com overfitting. Vemos que o modelo atingiu 100% de acurácia com o conjunto de testes.
 
- * Treino muito raso
-
- * Não houve verificação do dataset para o teste inicial, o subset do dataset completo ocorreu de forma inesperada pois faltou a inclusão do restante dos dados. Isso acarretou em desbalanceamento de classes de forma não intencional.
-Este erro será carregado para os próximos testes.
-
- * Erros de identificação dos dias na matriz de confusão.
-
-## Reteste com estratificação na divisão do dataset com treino mais longe
-
- * Não foi feito pré-processamento
- * Divisão dos dados em treinamento, validação e teste. 60/20/20
- * Treinamento de 32 épocas e batch size 32
-
-Resultados obtidos:
-
-Com um treino mais longo foi possível mitigar parcialmente os erros carregados do setup inicial, vemos que a precisão aumentou para 58% porém é possível notar que o modelo não está conseguindo diferenciar os dias que são próximos um do outro como visto nos dias 0, 1, 2, 3, 4 e 5 e é confirmado indice maior de acertos nos dias 7, 9, 11, 24 e 31.
+Resultados:
+<figure>
+    <img src="assets/images/model2/model_v2_metodo1_test_dataset.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V2 pelo método 1</figcaption>
+</figure>
 
 ```
               precision    recall  f1-score   support
 
-           0       1.00      0.29      0.45      1233
-           1       0.00      0.00      0.00         0
-           2       0.63      0.93      0.75       247
-           3       0.00      0.00      0.00         0
-           4       0.00      0.00      0.00         0
-           5       0.33      1.00      0.50        33
-           6       1.00      0.90      0.95       270
-           7       0.81      0.58      0.68       208
-           8       0.54      0.85      0.66       210
-           9       0.89      0.89      0.89       227
-          10       0.63      0.79      0.70       267
+           0       1.00      1.00      1.00        42
+           1       1.00      1.00      1.00        42
+           2       1.00      1.00      1.00        42
+           3       1.00      1.00      1.00        42
+           4       1.00      1.00      1.00        42
+           5       1.00      1.00      1.00        42
 
-    accuracy                           0.58      2695
-   macro avg       0.53      0.57      0.51      2695
-weighted avg       0.86      0.58      0.62      2695
+    accuracy                           1.00       252
 ```
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/tomato_baseline_32_epochs-epoch=24-val_acc=0.58.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 10 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,24,31]</figcaption>
-    </figure>
-</div>
+#### Comparaçao entre Model V1 e V2 utilizando dataset 2.
 
+Analisando o dataset utilizado no treinamento, é possível que ele esteja contaminado pois o conjunto de testes é proveniente do mesmo dataset. Desta forma foi utilizando um segundo dataset que não passou pelo treinamento para poder obter métricas reais dos dois modelos.
 
-Erros cometidos:
-
- * Não houve verificação do dataset para o teste inicial, o subset do dataset completo ocorreu de forma inesperada pois faltou a inclusão do restante dos dados. Isso acarretou em desbalanceamento de classes de forma não intencional.
-Este erro será carregado para os próximos testes.
-
- * Erros de identificação dos dias na matriz de confusão.
-
-### Teste com conversão para grayscale
-
- * Pré-processamento convertendo imagem em grayscale
-<div style="text-align:center">
-    <figure>
-        <img src="data/processed/grayscale_images.png"
-            alt="workflow">
-        <figcaption>Tensor com as imagens processadas em grayscale</figcaption>
-    </figure>
-</div>
-
- * Divisão dos dados em treinamento, validação e teste. 60/20/20
- * Treinamento de 32 épocas e batch size 32
-  
-Resultados obtidos:
-
-A priore a acurácia diminuiu em relação a versão sem pré-processamento, porém se observamos a distribuição das predições podemos ver que antes a maioria se concentrava no dia 0, agora está disperso na matriz de confusão ou seja o modelo não está mais com o bias no dia 0
+##### Model V1 com Conjunto 2
+Resultados:
+<figure>
+    <img src="assets/images/model2/model_v1_metodo1_conjunto2.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V1 pelo método 1 com conjunto 2</figcaption>
+</figure>
 
 ```
               precision    recall  f1-score   support
 
-           0       1.00      0.44      0.61       820
-           1       0.00      0.00      0.00         0
-           2       0.00      0.00      0.00         0
-           3       1.00      0.94      0.97       224
-           4       0.00      0.00      0.00         0
-           5       1.00      0.43      0.61       230
-           6       1.00      0.71      0.83       339
-           7       1.00      0.43      0.60       346
-           8       0.00      0.00      0.00         0
-           9       1.00      0.44      0.61       509
-          10       0.58      0.86      0.69       227
+           0       1.00      0.99      0.99       420
+           1       0.99      1.00      0.99       420
+           2       0.73      0.98      0.84       420
+           3       0.00      0.00      0.00       420
+           4       0.38      1.00      0.55       420
+           5       0.00      0.00      0.00       420
 
-    accuracy                           0.55      2695
-   macro avg       0.60      0.39      0.45      2695
-weighted avg       0.96      0.55      0.67      2695
-```
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/tomato_baseline_grayscale_32_epochs.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 10 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,24,31]</figcaption>
-    </figure>
-</div>
-
-Erros cometidos:
-
- * Não houve verificação do dataset para o teste inicial, o subset do dataset completo ocorreu de forma inesperada pois faltou a inclusão do restante dos dados. Isso acarretou em desbalanceamento de classes de forma não intencional.
-Este erro será carregado para os próximos testes.
-
- * Erros de identificação dos dias na matriz de confusão.
-  
-### Teste com conversão em grayscale e tratamento de desbalanço de classe
-
-Como dito anteriormente, o subset está com desbalanço de classes, desta forma foi aplicado balanceamento de classes utilizando pesos na função de CrossEntropyLoss, onde os pessos foram calculados seguindo o recomendo pelo [scikit-learn compute_class_weight](https://scikit-learn.org/stable/modules/generated/sklearn.utils.class_weight.compute_class_weight.html):
-
-\[\frac{n_{samples}}{(n_{classes}*count_{class})}\]
-
- * Pré-processamento convertendo em grayscale
- * Divisão dos dados em treinamento, validação e teste. 60/20/20
- * Treinamento de 32 épocas e batch size 32
- * Balanceamento de classes por pesos
-
-Resultados obtidos:
-
-Para o subset utilizando, a solução de aplicar pesos se mostrou eficaz pois houve um aumento de 20% de acurácia além de aparentar uma melhor distribuição de predições. Porém nota-se que há lacunas de predição nas labels 3 e 7, equivalente a dia 3 e dia 9 também nota-se que ainda há o bias de predição no dia 0.
-
-```
-              precision    recall  f1-score   support
-
-           0       1.00      0.41      0.58       312
-           1       1.00      0.96      0.98       104
-           2       0.97      0.80      0.88       130
-           3       0.00      0.00      0.00         0
-           4       0.96      0.70      0.81       151
-           5       0.90      0.86      0.88       105
-           6       1.00      0.85      0.92       133
-           7       0.00      0.00      0.00         0
-           8       0.51      0.57      0.53        69
-           9       0.84      1.00      0.91        96
-          10       0.58      1.00      0.73        80
-
-    accuracy                           0.72      1180
-   macro avg       0.71      0.65      0.66      1180
-weighted avg       0.91      0.72      0.78      1180
+    accuracy                           0.66      2520
 ```
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/tomato_baseline_grayscale_weigthned_32_epochs.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 10 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,24,31]</figcaption>
-    </figure>
-</div>
+##### Model V2 com Conjunto 2
+Resultados:
 
-#### Avaliação do modelo utilizando conjunto de teste
-
-Além do teste anterior foi feito um teste com um conjunto a parte isolado com as classes dia 0, dia 5 e dia 11 equivalente às labels 0, 5 e 8. O resultado não se mostrou satisfatório. Pode ser que ocorreu overfitting do modelo ou o conjunto de teste está catalogado de forma indevida
-
-```
-              precision    recall  f1-score   support
-
-           0       0.00      0.00      0.00        23
-           1       0.13      0.67      0.21         9
-           2       0.26      0.23      0.25        43
-           4       0.00      0.00      0.00        49
-
-    accuracy                           0.13       124
-   macro avg       0.10      0.22      0.12       124
-weighted avg       0.10      0.13      0.10       124
-```
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/test_from_model_weights.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 10 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,24,31]</figcaption>
-    </figure>
-</div>
-
-Erros cometidos:
-
- * Erros de identificação dos dias na matriz de confusão.
- * Possivelmente ocorreu overfitting do modelo
-
-### Teste com dataset completo
-
-Neste teste foi feito com o dataset inteiro, com todas as 63mil imagens, desta forma haverá a inclusão de uma classe a mais, o dia 15 e também será utilizado as seguintes configurações:
-
- * Modelo base de 3 camadas convolucionais
- * Pré-processamento convertendo em grayscale
- * Divisão dos dados em treinamento e validação. 80/20
- * Treinamento de 32 épocas e batch size 32
- * Não foi feito balanceamento de classes pois as classes possui quantidades semelhantes de amostra
-
-Resultados obtidos:
-
-Apesar de atingir uma acurácia de 91% com o conjunto de validação, ao realizar um teste com o conjunto de testes mencionado anteriormente, a precisão cai para 10% logo podemos confirmar que o modelo está tendo overfitting. Além de que o modelo teve apenas 11 épocas de treinamento, não finalizando as 32 épocas.
+<figure>
+    <img src="assets/images/model2/model_v2_metodo1_conjunto2.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V2 pelo método 1 com conjunto 2</figcaption>
+</figure>
 
 
 ```
               precision    recall  f1-score   support
 
-           0       0.49      0.94      0.65       562
-           1       0.94      0.64      0.76      1471
-           2       0.55      0.99      0.70       579
-           3       1.00      0.98      0.99      1072
-           4       1.00      0.89      0.94      1211
-           5       0.99      0.95      0.97      1098
-           6       0.99      1.00      0.99      1046
-           7       1.00      0.91      0.95      1147
-           8       1.00      0.92      0.96      1151
-           9       1.00      0.93      0.97      1124
-          10       0.99      0.94      0.97      1112
-          11       0.99      1.00      0.99      1104
+           0       0.47      0.52      0.49       420
+           1       0.23      0.05      0.08       420
+           2       0.49      0.66      0.56       420
+           3       0.40      0.36      0.38       420
+           4       0.72      0.51      0.60       420
+           5       0.53      0.90      0.67       420
 
-    accuracy                           0.91     12677
-   macro avg       0.91      0.92      0.90     12677
-weighted avg       0.95      0.91      0.92     12677
+    accuracy                           0.50      2520
 ```
 
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/tomato_baseline_grayscale_32_epochs_full-epoch=11-val_acc=0.91.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 11 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,15,24,31]</figcaption>
-    </figure>
-</div>
+Dado os resultados acima, observe-se que o modelo 1 com o conjunto 2 apesar de ter a maior acurácia, o F1-score dele é muito baixo pois o model V1 errou completamente as classes 3 e 5 igual ao teste feito com o dataset de teste.
 
-#### Avaliação do modelo utilizando conjunto de teste
+Já no modelo 2, apesar dele estar com overfitting ao testar com o conjunto 2 vemos que a acurácia dele é de 50% com uma boa distribuição de F1-Score com exceção da classe 1, e observa-se pela matriz de confusão que o modelo 2 conseguiu passar de fato por um treinamento efetivo pois vê-se que há proximidade entre as predições, não tendo ocorrências muito distantes entre si, isto é, falso negativo na classe 2 visto no resultado do modelo v1.
+
+### Método 2
+Neste método, o conjunto de dados foi rotulado entre verde(dia 0 a dia 3), maduro(dia 4 a dia 9) e senescente(dia 11 a dia 31).
+
+As etapas de teste para este método foram as mesmas do método anterior, inclusive foram feitas de maneira simultânea.
+
+#### Model V1
+
+Como neste método possui menos classes, alto índice de falso negativo é mais grave que o método anterior e neste caso como se pode observar abaixo, o modelo 1 classificou toda a classe 1 como 0, desta forma é um erro grave a ser corrigido.
+
+Resultados:
+
+<figure>
+    <img src="assets/images/model2/model_v1_metodo2_test_dataset.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V1 pelo método 2</figcaption>
+</figure>
+
 ```
               precision    recall  f1-score   support
 
-           0       0.10      0.80      0.18         5
-           1       0.19      0.29      0.23        31
-           2       0.00      0.00      0.00        38
-           3       0.00      0.00      0.00         8
-           4       0.00      0.00      0.00        33
-           5       0.00      0.00      0.00         4
-          10       0.00      0.00      0.00         5
+           0       0.50      1.00      0.67        84
+           1       0.00      0.00      0.00        84
+           2       1.00      1.00      1.00        84
 
-    accuracy                           0.10       124
-   macro avg       0.04      0.16      0.06       124
-weighted avg       0.05      0.10      0.07       124
+    accuracy                           0.67       252
 ```
-<div style="text-align:center">
-    <figure>
-        <img src="assets/images/test_from_model_full.png"
-            alt="workflow">
-        <figcaption>Matriz de confusão do teste inicial. Labels de 0 a 11 onde representam respectivamente dias [0,1,2,3,4,5,7,9,11,15,24,31]</figcaption>
-    </figure>
-</div>
 
-Erros cometidos:
+#### Model V2
 
- * Overfitting do modelo
+Da mesma forma que o método 1, o modelo V2 tem alta tendência a overfitting necessitando mais ajustes no modelo. Entretanto da mesma forma, o a acurácia de 100% demorou a ser atingida, diferente do modelo V1 que atingiu 67% em poucas épocas e estagnou.
 
-## Próximos passos
+Resultados:
 
-Para os próximos passos iremos explorar a utilização de normalização dos valores de entrada e aplicar o BatchNorm2D no modelo e incluir uma camada de Dropout para lidar com o overfitting. Além disso testaremos diminuir o learning rate visto que em apenas 11 épocas o modelo já atingiu 91% de acurácia no modelo de validação. 
+<figure>
+    <img src="assets/images/model2/model_v2_metodo2_test_dataset.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V2 pelo método 2</figcaption>
+</figure>
 
-Conforme a finalização do projeto se aproxima, possivelmente não acontecerá os testes em modelos pré-treinados.
 
+```
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00        84
+           1       1.00      1.00      1.00        84
+           2       1.00      1.00      1.00        84
+
+    accuracy                           1.00       252
+```
+
+#### Comparaçao entre Model V1 e V2 utilizando dataset 2.
+
+Como visto anteriormente Model V2, apesar do overfitting, se destacou mais quando submetido a um segundo conjunto de dados, podemos ver que o mesmo resultado é obtido para o método 2
+
+##### Model V2 com Conjunto 2
+
+Resultados:
+
+<figure>
+    <img src="assets/images/model2/model_v2_metodo2_conjunto2.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V2 pelo método 2</figcaption>
+</figure>
+
+
+```
+              precision    recall  f1-score   support
+
+           0       0.73      0.68      0.70       840
+           1       0.70      0.76      0.73       840
+           2       1.00      0.99      1.00       840
+
+    accuracy                           0.81      2520
+```
+
+#### Model V2 em RGB com Conjunto 2
+
+Por fim foi feito um teste sem o pré-processamento para grayscale a fim de comparar o resultado anterior
+
+
+<figure>
+    <img src="assets/images/model2/model_v2_metodo2_conjunto2_rgb.png"
+        alt="workflow">
+    <figcaption>Resultado do modelo V2 pelo método 2</figcaption>
+</figure>
+
+
+```
+              precision    recall  f1-score   support
+
+           0       0.63      0.57      0.60       840
+           1       0.67      0.88      0.76       840
+           2       1.00      0.78      0.88       840
+
+    accuracy                           0.75      2520
+```
+
+Note que a acurácia de ambos os testes com e sem RGB são próximas. Percebe-se que com cores o modelo V2 consegue identificar um pouco melhor se o tomate está maduro, já em cinza o modelo V2 consegue identificar muito bem se o tomate está senescente.
+
+#### Discussão
+
+Vemos pelos resultados anteriores que determinar a forma de se rotular o conjunto de dados pode impactar em como o modelo deve ser avaliado. Inicialmente esperava-se classificar por dia específico porém dado o contexto industrial de produção, não há necessidade de tamanha precisão de dia possibilitando a redução do escopo de classes para 6 ou 3 classes.
+
+Dos experimentos feitos, ao utilizar o método 2 se mostrou muito mais vantajoso pois nele compacta-se os estágios de maturação comumente utilizados que são verde, maduro e senescente. Além disso, a utilização ou não dos canais de cores se mostrou capaz de impactar na predição do modelo, visto que o uso de cinza melhora a predição de senescente e o uso de RGB melhora a predição de maduro em detrimento de maior índice de falsos negativos.
+
+Por fim, dos resultados obtidos, ainda necessita de mais estudo em relação ao uso do modelo correto e definir claramente o que se espera extrair como característica da imagem.
+
+## Conclusão
+
+Com base na discussão dos resultados, destaca-se a importância do conhecimento no tratamento de dados, isto é, análise, rotulação e pré-processamento. Das métricas utilizadas para avaliar os modelos, podemos concluir que foram eficazes pois a partir delas foi possível identificar onde o modelo precisava ser ajustado.
+
+Além disso o uso em conjunto das métricas se mostrou eficaz visto que pode se obter informações relevantes pela matriz de confusão para identificar a proximidade dos falsos negativos e falsos positivos dos verdadeiros positivos.
+
+Por se tratar de grandes estruturas de código e diversas configurações de experimento, mostrou-se um grande desafio a organizaçao de projeto e definiçao de um worlflow além das horas restritas de uso do ambiente gratuito do Google Colab.
+
+## Trabalhos futuros
+
+Para trabalhos futuros, sugere-se:
+
+ * Uso de mais técnicas de data augmentation, foram utilizadas poucas técnicas
+ * Testar modelos de classificação diferentes como por exemplo SVM
+ * Estudo da melhor maneira de se rotular o conjunto de dados, isto é, o período adequado entre verde, maturaçao e senescente
+ * Obter conjunto de dados com maior diversidade de tomates
 ## Referências
 <a id="1">[1]</a> J. F. Serighelli, E. Fujiwara and C. M. B. Cordeiro, "Quantitative Biospeckle Spectral and Angular Analysis of Tomatoes at Different Ripening Stages," 2023 International Conference on Optical MEMS and Nanophotonics (OMN) and SBFoton International Optics and Photonics Conference (SBFoton IOPC), Campinas, Brazil, 2023, pp. 1-2, doi: https://doi.org/10.1109/OMN/SBFotonIOPC58971.2023.10230977.
 
